@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
-  loadState, saveState, formatTime, shuffled, storageKey,
+  loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
 } from '../assets/core.js';
 
 const manifest = { exams: [{ id: 'FA24-FE' }, { id: 'SP25-B5' }] };
@@ -128,4 +128,24 @@ test('formatTime returns 00:00 for non-finite input', () => {
   assert.equal(formatTime(Infinity), '00:00');
   assert.equal(formatTime(-Infinity), '00:00');
   assert.equal(formatTime(undefined), '00:00');
+});
+
+test('formatVotes shows the full distribution, highest count first', () => {
+  assert.equal(formatVotes({ A: 1, B: 3, D: 2 }, 'D'), 'B 3 · D 2 · A 1');
+});
+test('formatVotes puts the AI key first on ties', () => {
+  assert.equal(formatVotes({ A: 1, D: 1 }, 'D'), 'D 1 · A 1');
+  assert.equal(formatVotes({ A: 1, D: 1 }, 'A'), 'A 1 · D 1');
+  assert.equal(formatVotes({ B: 2, A: 2, D: 2 }, 'D'), 'D 2 · A 2 · B 2');
+});
+test('formatVotes handles multi-letter keys and a missing AI key', () => {
+  assert.equal(formatVotes({ AC: 2, BD: 1 }, 'BD'), 'AC 2 · BD 1');
+  assert.equal(formatVotes({ B: 1, A: 1 }), 'A 1 · B 1');
+});
+test('formatVotes returns an empty string for null, empty or junk votes', () => {
+  assert.equal(formatVotes(null, 'A'), '');
+  assert.equal(formatVotes(undefined, 'A'), '');
+  assert.equal(formatVotes({}, 'A'), '');
+  assert.equal(formatVotes(['A'], 'A'), '');
+  assert.equal(formatVotes({ A: 'x', B: 2 }, 'A'), 'B 2');
 });

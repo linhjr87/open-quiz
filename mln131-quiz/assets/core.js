@@ -68,6 +68,16 @@ export function formatTime(sec) {
   return `${mm}:${ss}`;
 }
 
+// "D 1 · A 1": the whole comment-vote distribution, highest count first,
+// the AI's key first among equal counts, then alphabetical. '' when there are no votes.
+export function formatVotes(votes, aiKey) {
+  if (!votes || typeof votes !== 'object' || Array.isArray(votes)) return '';
+  const entries = Object.entries(votes).filter(([, n]) => typeof n === 'number' && Number.isFinite(n));
+  entries.sort(([ka, na], [kb, nb]) =>
+    nb - na || (kb === aiKey) - (ka === aiKey) || (ka < kb ? -1 : ka > kb ? 1 : 0));
+  return entries.map(([k, n]) => `${k} ${n}`).join(' · ');
+}
+
 function mulberry32(seed) {
   let a = seed >>> 0;
   return () => {

@@ -40,7 +40,8 @@ svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-widt
 .brand .star{width:26px;height:26px;color:var(--bronze)}
 .brand .mark{font-family:var(--mono);font-size:13px;padding:3px 7px;border-radius:6px;background:var(--bronze-weak);color:var(--bronze);border:1px solid var(--bronze)}
 .bar .spacer{flex:1}
-.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;border:0;background:transparent}
+.bar .btn{white-space:nowrap;padding:0 12px}
+.iconbtn{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;border:0;background:transparent}
 .iconbtn:hover{background:var(--sunken)}
 .bar-title{display:flex;flex-direction:column;line-height:1.25;min-width:0}
 .bar-title b{font-size:15px}
@@ -107,7 +108,7 @@ h1{font-size:clamp(28px,6vw,40px);line-height:1.15;letter-spacing:-.025em;margin
 .after{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px}
 .verdict{font-weight:600;display:inline-flex;align-items:center;gap:6px}
 .verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
-.report{margin-left:auto;font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.report{margin-left:auto;min-height:44px;font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;text-decoration:none}
 .report:hover{color:var(--accent)}
 .nav{display:flex;gap:10px;justify-content:space-between;padding-block:20px}
 

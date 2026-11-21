@@ -2,6 +2,7 @@ import { loadState, storageKey } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
 const app = document.getElementById('app');
+const ISSUES_URL = 'https://github.com/linhjr87/open-quiz/issues';
 
 function bestScore(id) {
   const v = loadState(storageKey(id, 'best'), null);
@@ -25,7 +26,7 @@ function hero(total) {
         <span class="badge b-warn">${ic('warn')}Có tranh cãi</span>
         <span class="badge b-ai">${ic('cpu')}Đáp án AI, chưa đối chiếu</span>
       </div>
-      <p class="disclaimer">Không chính thức. Đề được chép lại từ ảnh và đáp án có thể sai.</p>
+      <p class="disclaimer">Không chính thức. Đề được chép lại từ ảnh và đáp án có thể sai. <a href="${ISSUES_URL}" target="_blank" rel="noopener">Báo lỗi</a></p>
     </div></div></section>`;
 }
 
@@ -58,7 +59,7 @@ function render(manifest) {
   for (const g of groups) {
     html += `<section class="term"><h2>${esc(g.term)}</h2><div class="list">${g.items.map(row).join('')}</div></section>`;
   }
-  html += '<p class="foot">Không chính thức. Đề được chép lại từ ảnh và đáp án có thể sai. Thấy lỗi thì bấm “Báo lỗi câu này” trong từng câu.</p></main>';
+  html += `<p class="foot">Không chính thức. Đề được chép lại từ ảnh và đáp án có thể sai. Thấy lỗi thì bấm “Báo lỗi câu này” trong từng câu hoặc <a href="${ISSUES_URL}" target="_blank" rel="noopener">báo lỗi tại đây</a>.</p></main>`;
   app.innerHTML = html;
 }
 

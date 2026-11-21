@@ -1,6 +1,6 @@
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
-  loadState, saveState, formatTime, shuffled, storageKey,
+  loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
 } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
@@ -14,9 +14,10 @@ let DATA = null;       // exam JSON
 let QS = [];           // questions
 let N = 0;
 let view = 'study';    // study | examStart | exam | result
-let study = { i: 0, responses: {}, draft: [] };
+let study = { i: 0, responses: {}, draft: [], confirmReset: false };
 let exam = null;       // {i, responses, flags:Set, order, endAt, minutes, submitted, confirm, auto, result}
 let tick = null;
+let focusNext = null; // selector to focus after the next render
 
 const qByN = (n) => QS.find((q) => q.n === n);
 const letters = (q) => Object.keys(q.options || {});
@@ -24,31 +25,24 @@ const pickOf = (q) => (Number.isInteger(q.pick) && q.pick > 0 ? q.pick : (q.answ
 const examTitle = () => (DATA.term && DATA.code ? `${DATA.term} · ${DATA.code}` : DATA.title || DATA.id);
 
 /* ---------- small helpers ---------- */
-function totalVotes(v) {
-  if (!v || typeof v !== 'object') return null;
-  const nums = Object.values(v).filter((x) => typeof x === 'number');
-  return nums.length ? nums.reduce((a, b) => a + b, 0) : null;
-}
-function votesFor(q, key) {
-  const v = q.commentVotes;
-  if (v && typeof v === 'object' && typeof v[key] === 'number') return v[key];
-  return null;
-}
 function badge(q) {
+  const aiKey = [...(q.aiAnswer || q.answer || [])].sort().join('');
+  const dist = esc(formatVotes(q.commentVotes, aiKey));
   if (q.status === 'verified') {
-    const n = votesFor(q, (q.aiAnswer || q.answer || []).join('')) ?? totalVotes(q.commentVotes);
-    return `<span class="badge b-ok">${ic('shield')}Đã đối chiếu${n === null ? '' : ` (${n} phiếu)`}</span>`;
+    return `<span class="badge b-ok">${ic('shield')}Đã đối chiếu${dist ? ` · ${dist}` : ''}</span>`;
   }
   if (q.status === 'disputed') {
     const ca = Array.isArray(q.commentAnswer) ? q.commentAnswer.join('') : '';
-    const n = votesFor(q, ca);
-    return `<span class="badge b-warn">${ic('warn')}Có tranh cãi · comment chọn ${esc(ca || '?')}${n === null ? '' : ` (${n} phiếu)`}</span>`;
+    return `<span class="badge b-warn">${ic('warn')}Có tranh cãi · comment chọn ${esc(ca || '?')}${dist ? ` · ${dist}` : ''}</span>`;
   }
   return `<span class="badge b-ai">${ic('cpu')}Đáp án AI, chưa đối chiếu</span>`;
 }
 function reportLink(q) {
   const title = encodeURIComponent(`[${DATA.id}] Câu ${q.n}: `);
   return `<a class="report" href="https://github.com/${REPO}/issues/new?title=${title}" target="_blank" rel="noopener">${ic('msg')}Báo lỗi câu này</a>`;
+}
+function quizFoot() {
+  return `<footer class="wrap foot">Không chính thức — đáp án có thể sai · <a href="https://github.com/${REPO}/issues" target="_blank" rel="noopener">Báo lỗi</a></footer>`;
 }
 function topbar(title, sub, right = '') {
   return `<header class="bar"><div class="wrap">
@@ -128,8 +122,8 @@ function renderStudy() {
   let after = '';
   if (locked) {
     const ok = isCorrect(q, locked);
-    after = `<div class="after">
-      <span class="verdict ${ok ? 'ok' : 'bad'}">${ok ? `${ic('check')}Chính xác` : `${ic('x')}Chưa đúng · đáp án ${esc((q.answer || []).join(', '))}`}</span>
+    after = `<div class="after" aria-live="polite">
+      <span class="verdict ${ok ? 'ok' : 'bad'}" tabindex="-1">${ok ? `${ic('check')}Chính xác` : `${ic('x')}Chưa đúng · đáp án ${esc((q.answer || []).join(', '))}`}</span>
       ${badge(q)}${reportLink(q)}</div>`;
   } else if (multi) {
     after = `<div class="after"><button class="btn primary" data-act="check" ${study.draft.length === p ? '' : 'disabled'}>${ic('check')}Kiểm tra</button><span class="q-hint">Đã chọn ${study.draft.length}/${p}</span>${reportLink(q)}</div>`;
@@ -137,6 +131,8 @@ function renderStudy() {
     after = `<div class="after">${reportLink(q)}</div>`;
   }
   const done = Object.keys(study.responses).length;
+  const resetConfirm = study.confirmReset ? `<div class="confirm" role="alert"><p><b>Làm lại từ đầu?</b> ${done ? `Toàn bộ ${done} câu đã làm sẽ bị xoá.` : 'Tiến độ sẽ được đặt lại.'}</p>
+     <div class="acts"><button class="btn primary" data-act="doResetStudy">Làm lại</button><button class="btn" data-act="cancelReset">Huỷ</button></div></div>` : '';
   const correct = QS.filter((x) => study.responses[x.n] && isCorrect(x, study.responses[x.n])).length;
   const cells = QS.map((x, i) => {
     const r = study.responses[x.n];
@@ -159,6 +155,7 @@ function renderStudy() {
     </div>
     <section class="panel">
       <div class="panel-head"><b>Đúng ${correct}/${done} câu đã làm</b><button class="btn ghost" data-act="resetStudy">${ic('reset')}Làm lại</button></div>
+      ${resetConfirm}
       <div class="grid">${cells}</div>
       <div class="keys"><span><i class="sw" style="background:var(--ok-weak);border-color:var(--ok)"></i>Đúng</span><span><i class="sw" style="background:var(--bad-weak);border-color:var(--bad);border-style:dashed"></i>Sai</span><span><i class="sw"></i>Chưa làm</span></div>
     </section>
@@ -167,6 +164,7 @@ function renderStudy() {
 function studyGo(i) {
   study.i = Math.max(0, Math.min(N - 1, i));
   study.draft = [];
+  study.confirmReset = false;
   saveStudy();
 }
 function studyPick(k) {
@@ -175,6 +173,11 @@ function studyPick(k) {
   if (pickOf(q) > 1) { study.draft = toggleIn(study.draft, k); return; }
   study.responses[q.n] = [k];
   saveStudy();
+}
+// Option buttons become disabled once answered, so focus would drop to <body>:
+// move it on to "Câu sau", or to the verdict on the last question.
+function focusAfterAnswer(q) {
+  if (study.responses[q.n]) focusNext = study.i === N - 1 ? '.verdict' : '[data-act="next"]';
 }
 function studyCheck() {
   const q = QS[study.i];
@@ -287,9 +290,12 @@ function renderResult() {
   const wrong = QS.filter((q) => wrongSet.has(q.n));
   const blank = QS.filter((q) => !exam.responses[q.n]).length;
   const wrongFilled = wrong.length - blank;
+  const shuffledOrder = exam.order.some((qi, i) => qi !== i);
+  const posOf = (q) => exam.order.indexOf(QS.indexOf(q)) + 1;
   const items = wrong.map((q) => {
     const p = exam.responses[q.n];
-    return `<div class="wl"><span class="q-num">Câu ${esc(q.n)}</span><p class="qt">${esc(q.text)}</p>
+    const label = shuffledOrder ? `Câu ${posOf(q)} (đề gốc ${q.n})` : `Câu ${q.n}`;
+    return `<div class="wl"><span class="q-num">${esc(label)}</span><p class="qt">${esc(q.text)}</p>
       <div class="ans">
         <div><span class="tag">Bạn chọn</span><span class="yours">${p ? answerLines(q, p) : 'Bỏ trống'}</span></div>
         <div><span class="tag">Đáp án</span><span class="key">${answerLines(q, q.answer || [])}</span></div>
@@ -299,7 +305,7 @@ function renderResult() {
     <div class="score"><div class="big">${res.score10.toFixed(2)}<small> /10</small></div>
       <div class="stat">${res.correct}/${res.total} câu đúng · ${wrongFilled} sai · ${blank} bỏ trống${exam.auto ? ' · hết giờ, tự nộp' : ''}</div></div>
     <div class="meter" aria-hidden="true"><i style="width:${(res.correct / (N || 1)) * 100}%;background:var(--ok)"></i><i style="width:${(wrongFilled / (N || 1)) * 100}%;background:var(--bad)"></i></div>
-    <h2 style="font-size:18px;margin:0 0 12px">${wrong.length ? `Câu làm sai (${wrong.length})` : 'Không sai câu nào'}</h2>
+    <h2 style="font-size:18px;margin:0 0 12px">${wrong.length ? `Câu sai / bỏ trống (${wrong.length})` : 'Không sai câu nào'}</h2>
     <div class="wrong-list">${items}</div>
     <div class="row-acts"><button class="btn primary" data-act="examStart">${ic('reset')}Thi lại</button><a class="btn" href="quiz.html?exam=${encodeURIComponent(DATA.id)}&amp;mode=study">${ic('book')}Ôn tập đề này</a><a class="btn ghost" href="index.html">Về trang chủ</a></div>
   </main>`;
@@ -314,11 +320,13 @@ function focusKey() {
 function render() {
   clearInterval(tick); tick = null;
   const fk = focusKey();
-  app.innerHTML = view === 'study' ? renderStudy()
+  app.innerHTML = (view === 'study' ? renderStudy()
     : view === 'examStart' ? renderExamStart()
-    : view === 'exam' ? renderExam() : renderResult();
+    : view === 'exam' ? renderExam() : renderResult()) + quizFoot();
   document.title = `${examTitle()} · MLN131`;
-  if (fk) { const el = app.querySelector(fk); if (el && !el.disabled) el.focus({ preventScroll: true }); }
+  const want = focusNext || fk;
+  focusNext = null;
+  if (want) { const el = app.querySelector(want); if (el && !el.disabled) el.focus({ preventScroll: true }); }
   if (view === 'exam') {
     tick = setInterval(() => {
       const r = remaining(), el = document.getElementById('timer');
@@ -341,12 +349,14 @@ app.addEventListener('click', (e) => {
   const a = b.dataset.act;
   let scroll = false;
   if (a === 'examStart') { view = 'examStart'; scroll = true; }
-  else if (a === 'pick') studyPick(b.dataset.k);
-  else if (a === 'check') studyCheck();
+  else if (a === 'pick') { studyPick(b.dataset.k); focusAfterAnswer(QS[study.i]); }
+  else if (a === 'check') { studyCheck(); focusAfterAnswer(QS[study.i]); }
   else if (a === 'prev') { studyGo(study.i - 1); scroll = true; }
   else if (a === 'next') { studyGo(study.i + 1); scroll = true; }
   else if (a === 'go') { studyGo(+b.dataset.i); scroll = true; }
-  else if (a === 'resetStudy') { study = { i: 0, responses: {}, draft: [] }; saveStudy(); scroll = true; }
+  else if (a === 'resetStudy') { study.confirmReset = true; focusNext = '[data-act="cancelReset"]'; }
+  else if (a === 'cancelReset') { study.confirmReset = false; focusNext = '[data-act="resetStudy"]'; }
+  else if (a === 'doResetStudy') { study = { i: 0, responses: {}, draft: [], confirmReset: false }; saveStudy(); focusNext = '[data-act="resetStudy"]'; scroll = true; }
   else if (a === 'epick') examPick(b.dataset.k);
   else if (a === 'eprev') { examGo(exam.i - 1); scroll = true; }
   else if (a === 'enext') { examGo(exam.i + 1); scroll = true; }
@@ -356,8 +366,8 @@ app.addEventListener('click', (e) => {
     if (!exam.flags.delete(n)) exam.flags.add(n);
     saveExam();
   }
-  else if (a === 'askSubmit') exam.confirm = true;
-  else if (a === 'cancelSubmit') exam.confirm = false;
+  else if (a === 'askSubmit') { exam.confirm = true; focusNext = '[data-act="submit"]'; }
+  else if (a === 'cancelSubmit') { exam.confirm = false; focusNext = '[data-act="askSubmit"]'; }
   else if (a === 'submit') { submit(false); return; }
   render();
   if (scroll) window.scrollTo(0, 0);
@@ -370,8 +380,8 @@ document.addEventListener('keydown', (e) => {
   const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
   if (view === 'study') {
     const q = QS[study.i];
-    if (k.length === 1 && letters(q).includes(k)) { studyPick(k); render(); }
-    else if (e.key === 'Enter' && pickOf(q) > 1 && !study.responses[q.n] && study.draft.length === pickOf(q) && e.target === document.body) { studyCheck(); render(); }
+    if (k.length === 1 && letters(q).includes(k)) { studyPick(k); focusAfterAnswer(q); render(); }
+    else if (e.key === 'Enter' && pickOf(q) > 1 && !study.responses[q.n] && study.draft.length === pickOf(q) && e.target === document.body) { studyCheck(); focusAfterAnswer(q); render(); }
     else if (e.key === 'ArrowRight' && study.i < N - 1) { studyGo(study.i + 1); render(); }
     else if (e.key === 'ArrowLeft' && study.i > 0) { studyGo(study.i - 1); render(); }
   } else if (view === 'exam') {
@@ -386,7 +396,7 @@ document.addEventListener('keydown', (e) => {
 function notFound(msg) {
   document.title = 'Không tìm thấy đề · MLN131';
   app.innerHTML = `<header class="bar"><div class="wrap"><div class="brand">${drumSvg(26, 'star', true)}<span class="mark">MLN131</span>Phòng thi thử</div></div></header>
-    <main class="wrap"><div class="notice"><h1>${esc(msg)}</h1><p>Đề này không có trong danh sách hoặc không tải được.</p><a class="btn primary" href="index.html">${ic('back')}Về trang chủ</a></div></main>`;
+    <main class="wrap"><div class="notice"><h1>${esc(msg)}</h1><p>Đề này không có trong danh sách hoặc không tải được.</p><a class="btn primary" href="index.html">${ic('back')}Về trang chủ</a></div></main>${quizFoot()}`;
 }
 async function main() {
   let manifest;
