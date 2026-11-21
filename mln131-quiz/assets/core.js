@@ -118,7 +118,9 @@ export function expireIfIdle(now, storage) {
     const st = storage === undefined ? globalThis.localStorage : storage;
     let last = null;
     const raw = st.getItem(LAST_SEEN_KEY);
-    if (raw !== null && raw !== undefined) last = JSON.parse(raw);
+    if (raw !== null && raw !== undefined) {
+      try { last = JSON.parse(raw); } catch { last = null; } // hỏng: coi như chưa có, ghi lại bên dưới
+    }
     let wiped = false;
     if (typeof last === 'number' && Number.isFinite(last) && now - last > IDLE_RESET_MS) {
       const keys = [];
@@ -192,6 +194,16 @@ export function historyStats(history) {
     } else if (a.mode === 'study') studies++;
   }
   return { exams, studies, best };
+}
+
+// Điểm cao nhất của một đề: khoá cũ `best` (trước khi có lịch sử) gộp với điểm thi thử cao nhất
+// trong lịch sử. null khi chưa có điểm nào.
+export function bestOf(examId, history) {
+  const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
+  const legacy = loadState(storageKey(examId, 'best'), null);
+  const hist = historyStats(history).best;
+  const vals = [legacy, hist].filter(isNum);
+  return vals.length ? Math.max(...vals) : null;
 }
 
 export function formatDate(ms) {

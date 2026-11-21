@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
   loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
-  expireIfIdle, sanitizeHistory, loadHistory, appendAttempt, makeAttempt, wrongOf, historyStats, formatDate,
+  expireIfIdle, sanitizeHistory, loadHistory, appendAttempt, makeAttempt, wrongOf, historyStats, formatDate, bestOf,
 } from '../assets/core.js';
 
 const manifest = { exams: [{ id: 'FA24-FE' }, { id: 'SP25-B5' }] };
@@ -226,4 +226,23 @@ test('historyStats counts modes and takes the best exam score', () => {
 });
 test('formatDate is dd/mm/yyyy', () => {
   assert.equal(formatDate(new Date(2026, 10, 2).getTime()), '02/11/2026');
+});
+test('expireIfIdle repairs a corrupt lastSeen without wiping data', () => {
+  const st = fakeStorage({ 'mln131:lastSeen': 'not json{', 'mln131:X:study': '{}' });
+  assert.equal(expireIfIdle(500, st), false);
+  assert.ok('mln131:X:study' in st.data);
+  assert.equal(JSON.parse(st.data['mln131:lastSeen']), 500);
+});
+test('bestOf merges the legacy best key with the history best', () => {
+  const hist = (best) => ({ v: 1, attempts: best == null ? [{ mode: 'study' }] : [{ mode: 'exam', score10: best }] });
+  withLocalStorage({ value: fakeStorage({ 'mln131:L:best': '6.5', 'mln131:B:best': '4', 'mln131:J:best': '"x"' }) }, () => {
+    assert.equal(bestOf('L', hist(null)), 6.5);          // legacy only
+    assert.equal(bestOf('H', hist(7)), 7);               // history only
+    assert.equal(bestOf('B', hist(7)), 7);               // both -> max
+    assert.equal(bestOf('L', hist(3)), 6.5);             // both -> max (legacy wins)
+    assert.equal(bestOf('H', hist(null)), null);         // neither
+    assert.equal(bestOf('H', undefined), null);
+    assert.equal(bestOf('J', hist(null)), null);         // non-numeric legacy ignored
+    assert.equal(bestOf('J', hist(5)), 5);
+  });
 });

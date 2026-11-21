@@ -1,16 +1,8 @@
-import { loadState, storageKey, expireIfIdle, loadHistory, historyStats } from './core.js';
+import { expireIfIdle, loadHistory, historyStats, bestOf } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
 const app = document.getElementById('app');
 const ISSUES_URL = 'https://github.com/linhjr87/open-quiz/issues';
-
-function bestScore(id, histBest) {
-  const v = loadState(storageKey(id, 'best'), null);
-  const old = typeof v === 'number' && Number.isFinite(v) ? v : null;
-  const h = typeof histBest === 'number' && Number.isFinite(histBest) ? histBest : null;
-  if (old === null) return h;
-  return h === null ? old : Math.max(old, h);
-}
 
 function header() {
   return `<header class="bar"><div class="wrap"><div class="brand">${drumSvg(26, 'star', true)}<span class="mark">MLN131</span>Phòng thi thử</div></div></header>`;
@@ -38,7 +30,7 @@ function row(e) {
   const disputed = Number(e.stats && e.stats.disputed) || 0;
   const history = loadHistory(e.id);
   const st = historyStats(history);
-  const best = bestScore(e.id, st.best);
+  const best = bestOf(e.id, history);
   const code = e.term && e.code ? `${e.term} · ${e.code}` : e.title || e.id;
   const subs = [`<span>${Number(e.count) || 0} câu</span>`];
   if (disputed) subs.push(`<span>${ic('warn', 'style="width:14px;height:14px;vertical-align:-2px;color:var(--warn)"')} ${disputed} câu tranh cãi</span>`);

@@ -1,7 +1,7 @@
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
   loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
-  loadHistory, wrongOf, historyStats, formatDate, makeAttempt, appendAttempt, expireIfIdle,
+  loadHistory, wrongOf, historyStats, formatDate, bestOf, makeAttempt, appendAttempt, expireIfIdle,
 } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
@@ -237,7 +237,9 @@ function studyGo(i) {
   saveStudy();
 }
 function studyPick(k) {
-  if (roundPick(study, QS[study.i], k)) saveStudy();
+  if (!roundPick(study, QS[study.i], k)) return false;
+  saveStudy();
+  return true;
 }
 // Option buttons become disabled once answered, so focus would drop to <body>:
 // move it on to "Câu sau", or to the verdict on the last question.
@@ -245,7 +247,15 @@ function focusAfterAnswer(q) {
   if (study.responses[q.n]) focusNext = study.i === N - 1 ? '.verdict' : '[data-act="next"]';
 }
 function studyCheck() {
-  if (roundCheck(study, QS[study.i])) saveStudy();
+  if (!roundCheck(study, QS[study.i])) return false;
+  saveStudy();
+  return true;
+}
+// Focus + history recording only when an answer was just locked (not on stray keys).
+function afterStudyLock(locked, q) {
+  if (!locked) return;
+  focusAfterAnswer(q);
+  maybeRecordStudy();
 }
 // Once every question has an answer, write one history entry for the round
 // and show the completion card. Call after focusAfterAnswer so the card wins focus.
@@ -268,6 +278,7 @@ function renderHistory() {
     <div class="acts-inline">${modeActs}</div></div></main>`;
   }
   const st = historyStats(HIST);
+  const best = bestOf(DATA.id, HIST);
   const rows = HIST.attempts.map((a, idx) => ({ a, k: idx + 1 })).reverse().map(({ a, k }) => {
     const wrong = wrongOf(a, QS).length;
     const res = a.mode === 'exam'
@@ -277,12 +288,12 @@ function renderHistory() {
       <div class="meta"><div class="hl">${modeChip(a.mode)}<span class="date mono">${formatDate(a.at)}</span></div>
         <div class="hres">${res}</div>
         <div class="mini" aria-hidden="true"><i style="width:${(a.correct / a.total) * 100}%;background:var(--ok)"></i><i style="width:${((a.total - a.correct) / a.total) * 100}%;background:var(--bad)"></i></div></div>
-      <div class="acts">${wrong ? `<a class="btn" href="${modeUrl('review', `&amp;attempt=${k}`)}">${ic('target')}Ôn ${wrong} câu sai</a>` : `<span class="allok">${ic('check')}Không sai câu nào</span>`}</div></li>`;
+      <div class="acts">${wrong ? `<a class="btn" href="${modeUrl('review', `&amp;attempt=${k}`)}" aria-label="Ôn ${wrong} câu sai của lần #${k}">${ic('target')}Ôn ${wrong} câu sai</a>` : `<span class="allok">${ic('check')}Không sai câu nào</span>`}</div></li>`;
   }).join('');
   return topbar(title, 'Lịch sử làm bài') + `<main class="wrap">
     <div class="hist-sum">
       <div class="tile"><span>Thi thử</span><b>${st.exams}</b><small>lần</small></div>
-      <div class="tile"><span>Cao nhất</span><b>${st.best == null ? '—' : st.best.toFixed(2)}</b><small>${st.best == null ? 'chưa thi thử' : '/10 điểm'}</small></div>
+      <div class="tile"><span>Cao nhất</span><b>${best === null ? '—' : best.toFixed(2)}</b><small>${best === null ? 'chưa thi thử' : '/10 điểm'}</small></div>
       <div class="tile"><span>Ôn tập</span><b>${st.studies}</b><small>lần</small></div>
     </div>
     <h2 class="sec">Các lần làm <span class="q-hint">· mới nhất ở trên</span></h2>
@@ -372,12 +383,14 @@ function renderExamStart() {
       <ul class="rules"><li>Không hiện đáp án cho tới khi nộp bài.</li><li>Phải làm đủ các câu mới nộp được. Hết giờ bài tự nộp, câu bỏ trống tính là sai.</li><li>Tải lại trang không mất bài đang làm.</li></ul>
     </form></main>`;
 }
-const answeredCount = () => Object.keys(exam.responses).length;
+// A question counts as answered only when it has exactly `pick` letters (partial multi-pick does not).
+const isAnswered = (q) => (exam.responses[q.n] || []).length === pickOf(q);
+const answeredCount = () => QS.filter(isAnswered).length;
 // Next unanswered question after the current one, wrapping around in exam.order; -1 when none.
 function nextBlank() {
   for (let s = 1; s <= N; s++) {
     const j = (exam.i + s) % N;
-    if (!exam.responses[QS[exam.order[j]].n]) return j;
+    if (!isAnswered(QS[exam.order[j]])) return j;
   }
   return -1;
 }
@@ -386,7 +399,7 @@ function renderExam() {
   const q = QS[exam.order[exam.i]];
   const sel = exam.responses[q.n] || [];
   const p = pickOf(q);
-  const answered = Object.keys(exam.responses).length;
+  const answered = answeredCount();
   const r = remaining();
   let opts = '';
   for (const k of letters(q)) {
@@ -395,10 +408,10 @@ function renderExam() {
   const cells = exam.order.map((qi, i) => {
     const x = QS[qi];
     let c = 'cell';
-    if (exam.responses[x.n]) c += ' done';
+    if (isAnswered(x)) c += ' done';
     if (exam.flags.has(x.n)) c += ' flag';
     if (i === exam.i) c += ' cur';
-    return `<button class="${c}" data-act="ego" data-i="${i}" aria-label="Câu ${i + 1}${exam.responses[x.n] ? ', đã làm' : ''}${exam.flags.has(x.n) ? ', cần xem lại' : ''}"${i === exam.i ? ' aria-current="true"' : ' tabindex="-1"'}>${i + 1}</button>`;
+    return `<button class="${c}" data-act="ego" data-i="${i}" aria-label="Câu ${i + 1}${isAnswered(x) ? ', đã làm' : ''}${exam.flags.has(x.n) ? ', cần xem lại' : ''}"${i === exam.i ? ' aria-current="true"' : ' tabindex="-1"'}>${i + 1}</button>`;
   }).join('');
   const left = N - answered, flagged = exam.flags.size;
   // Submit unlocks only when every question is answered; time-out is the one exception (submit(true)).
@@ -450,6 +463,7 @@ function examPick(k) {
   else if (cur.length >= p) return; // capped at pick
   else next = [...cur, k];
   if (next.length) exam.responses[q.n] = next; else delete exam.responses[q.n];
+  exam.confirm = false; // answers changed: the submit box must be asked for again
   saveExam();
 }
 function examGo(i) {
@@ -559,8 +573,8 @@ app.addEventListener('click', (e) => {
   const a = b.dataset.act;
   let scroll = false;
   if (a === 'examStart') { view = 'examStart'; scroll = true; }
-  else if (a === 'pick') { studyPick(b.dataset.k); focusAfterAnswer(QS[study.i]); maybeRecordStudy(); }
-  else if (a === 'check') { studyCheck(); focusAfterAnswer(QS[study.i]); maybeRecordStudy(); }
+  else if (a === 'pick') afterStudyLock(studyPick(b.dataset.k), QS[study.i]);
+  else if (a === 'check') afterStudyLock(studyCheck(), QS[study.i]);
   else if (a === 'prev') { studyGo(study.i - 1); scroll = true; }
   else if (a === 'next') { studyGo(study.i + 1); scroll = true; }
   else if (a === 'go') { studyGo(+b.dataset.i); navOpen = false; scroll = true; }
@@ -605,8 +619,8 @@ document.addEventListener('keydown', (e) => {
   const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
   if (view === 'study') {
     const q = QS[study.i];
-    if (k.length === 1 && letters(q).includes(k)) { studyPick(k); focusAfterAnswer(q); maybeRecordStudy(); render(); }
-    else if (e.key === 'Enter' && pickOf(q) > 1 && !study.responses[q.n] && study.draft.length === pickOf(q) && e.target === document.body) { studyCheck(); focusAfterAnswer(q); maybeRecordStudy(); render(); }
+    if (k.length === 1 && letters(q).includes(k)) { afterStudyLock(studyPick(k), q); render(); }
+    else if (e.key === 'Enter' && pickOf(q) > 1 && !study.responses[q.n] && study.draft.length === pickOf(q) && e.target === document.body) { afterStudyLock(studyCheck(), q); render(); }
     else if (e.key === 'ArrowRight' && study.i < N - 1) { studyGo(study.i + 1); render(); }
     else if (e.key === 'ArrowLeft' && study.i > 0) { studyGo(study.i - 1); render(); }
   } else if (view === 'review' && review) {
