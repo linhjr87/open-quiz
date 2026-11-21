@@ -1,6 +1,7 @@
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
   loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
+  loadHistory, wrongOf, historyStats, formatDate,
 } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
@@ -8,17 +9,20 @@ const REPO = 'linhjr87/open-quiz';
 
 const app = document.getElementById('app');
 const params = new URLSearchParams(location.search);
-const MODE = params.get('mode') === 'exam' ? 'exam' : 'study';
+const MODE = ['exam', 'history', 'review'].includes(params.get('mode')) ? params.get('mode') : 'study';
 
 let DATA = null;       // exam JSON
 let QS = [];           // questions
 let N = 0;
-let view = 'study';    // study | examStart | exam | result
+let view = 'study';    // study | examStart | exam | result | history | review
 let study = { i: 0, responses: {}, draft: [], confirmReset: false };
+let HIST = { v: 1, attempts: [] }; // attempt history of this exam
+let review = null;     // {k, attempt, ns, i, responses, draft}; not persisted
 let exam = null;       // {i, responses, flags:Set, order, endAt, minutes, submitted, confirm, auto, result}
 let tick = null;
 let focusNext = null; // selector to focus after the next render
 let navOpen = false;  // question list expanded (narrow screens only)
+let scrollTop = false; // scroll the window to the top after the next render
 
 const qByN = (n) => QS.find((q) => q.n === n);
 const letters = (q) => Object.keys(q.options || {});
@@ -26,7 +30,7 @@ const pickOf = (q) => (Number.isInteger(q.pick) && q.pick > 0 ? q.pick : (q.answ
 const examTitle = () => (DATA.term && DATA.code ? `${DATA.term} · ${DATA.code}` : DATA.title || DATA.id);
 
 /* ---------- small helpers ---------- */
-const isSplit = () => view === 'study' || view === 'exam';
+const isSplit = () => view === 'study' || view === 'exam' || (view === 'review' && !!review);
 function badge(q) {
   const aiKey = [...(q.aiAnswer || q.answer || [])].sort().join('');
   const dist = esc(formatVotes(q.commentVotes, aiKey));
@@ -46,9 +50,11 @@ function reportLink(q) {
 function quizFoot() {
   return `<footer class="wrap${isSplit() ? ' wide' : ''} foot">Không chính thức — đáp án có thể sai · <a href="https://github.com/${REPO}/issues" target="_blank" rel="noopener">Báo lỗi</a></footer>`;
 }
-function topbar(title, sub, right = '') {
+const modeUrl = (mode, extra = '') => `quiz.html?exam=${encodeURIComponent(DATA.id)}&amp;mode=${mode}${extra}`;
+function topbar(title, sub, right = '', back = 'home') {
+  const href = back === 'history' ? modeUrl('history') : 'index.html';
   return `<header class="bar"><div class="wrap${isSplit() ? ' wide' : ''}">
-    <a class="iconbtn" href="index.html" aria-label="Về trang chủ">${ic('back')}</a>
+    <a class="iconbtn" href="${href}" aria-label="${back === 'history' ? 'Về lịch sử' : 'Về trang chủ'}">${ic('back')}</a>
     <div class="bar-title"><b>${esc(title)}</b><span>${esc(sub)}</span></div>
     <div class="spacer"></div>${right}</div></header>`;
 }
@@ -72,6 +78,68 @@ function layout(side, body) {
     </aside>
     <main class="main">${body}</main>
   </div>`;
+}
+const modeChip = (mode) => (mode === 'exam'
+  ? `<span class="chip c-exam">${ic('clock')}Thi thử</span>`
+  : `<span class="chip c-study">${ic('book')}Ôn tập</span>`);
+function meter(ok, bad, total) {
+  const t = total || 1;
+  return `<div class="meter" aria-hidden="true"><i style="width:${(ok / t) * 100}%;background:var(--ok)"></i><i style="width:${(bad / t) * 100}%;background:var(--bad)"></i></div>`;
+}
+// Completion card shown at the top of the right column once every question
+// in the round is answered. Answers stay reviewable underneath.
+function doneCard({ eyebrow, ok, total, note, acts }) {
+  return `<section class="done-card" id="doneCard" tabindex="-1" aria-labelledby="doneTitle">
+    <div class="eyebrow" id="doneTitle">${eyebrow}</div>
+    <div class="score"><div class="big">${ok}<small>/${total}</small></div><div class="stat">${note}</div></div>
+    ${meter(ok, total - ok, total)}
+    <div class="acts">${acts}</div></section>`;
+}
+// Option buttons + the block under them, shared by Ôn tập and Ôn câu sai.
+// `locked` is the committed answer (or undefined), `draft` the multi-pick selection.
+function optButtons(q, locked, draft, act) {
+  const multi = pickOf(q) > 1;
+  const sel = locked || draft;
+  let opts = '';
+  for (const k of letters(q)) {
+    let cls = 'opt', s = '', pressed = '';
+    if (locked) {
+      if ((q.answer || []).includes(k)) { cls += ' right'; s = ic('check'); }
+      else if (locked.includes(k)) { cls += ' wrong'; s = ic('x'); }
+      else cls += ' dim';
+    } else if (multi) {
+      pressed = ` aria-pressed="${sel.includes(k)}"`;
+      if (sel.includes(k)) cls += ' sel';
+    }
+    opts += `<button class="${cls}" data-act="${act}" data-k="${esc(k)}"${pressed} ${locked ? 'disabled' : ''}><span class="k">${esc(k)}</span><span class="t">${esc(q.options[k])}</span><span class="s">${s}</span></button>`;
+  }
+  return opts;
+}
+function afterBlock(q, locked, draft, checkAct) {
+  const p = pickOf(q);
+  if (locked) {
+    const ok = isCorrect(q, locked);
+    return `<div class="after" aria-live="polite">
+      <span class="verdict ${ok ? 'ok' : 'bad'}" tabindex="-1">${ok ? `${ic('check')}Chính xác` : `${ic('x')}Chưa đúng · đáp án ${esc((q.answer || []).join(', '))}`}</span>
+      ${badge(q)}${reportLink(q)}</div>`;
+  }
+  if (p > 1) {
+    return `<div class="after"><button class="btn primary" data-act="${checkAct}" ${draft.length === p ? '' : 'disabled'}>${ic('check')}Kiểm tra</button><span class="q-hint">Đã chọn ${draft.length}/${p}</span>${reportLink(q)}</div>`;
+  }
+  return `<div class="after">${reportLink(q)}</div>`;
+}
+// Pick / check on a {responses, draft} round. Returns true when an answer got locked.
+function roundPick(st, q, k) {
+  if (st.responses[q.n] || !letters(q).includes(k)) return false;
+  if (pickOf(q) > 1) { st.draft = toggleIn(st.draft, k); return false; }
+  st.responses[q.n] = [k];
+  return true;
+}
+function roundCheck(st, q) {
+  if (st.responses[q.n] || st.draft.length !== pickOf(q)) return false;
+  st.responses[q.n] = [...st.draft];
+  st.draft = [];
+  return true;
 }
 const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x));
 
@@ -116,33 +184,8 @@ function saveExam() {
 function renderStudy() {
   const q = QS[study.i];
   const locked = study.responses[q.n];
-  const p = pickOf(q);
-  const multi = p > 1;
-  const sel = locked || study.draft;
-  let opts = '';
-  for (const k of letters(q)) {
-    let cls = 'opt', s = '', pressed = '';
-    if (locked) {
-      if ((q.answer || []).includes(k)) { cls += ' right'; s = ic('check'); }
-      else if (locked.includes(k)) { cls += ' wrong'; s = ic('x'); }
-      else cls += ' dim';
-    } else if (multi) {
-      pressed = ` aria-pressed="${sel.includes(k)}"`;
-      if (sel.includes(k)) cls += ' sel';
-    }
-    opts += `<button class="${cls}" data-act="pick" data-k="${esc(k)}"${pressed} ${locked ? 'disabled' : ''}><span class="k">${esc(k)}</span><span class="t">${esc(q.options[k])}</span><span class="s">${s}</span></button>`;
-  }
-  let after = '';
-  if (locked) {
-    const ok = isCorrect(q, locked);
-    after = `<div class="after" aria-live="polite">
-      <span class="verdict ${ok ? 'ok' : 'bad'}" tabindex="-1">${ok ? `${ic('check')}Chính xác` : `${ic('x')}Chưa đúng · đáp án ${esc((q.answer || []).join(', '))}`}</span>
-      ${badge(q)}${reportLink(q)}</div>`;
-  } else if (multi) {
-    after = `<div class="after"><button class="btn primary" data-act="check" ${study.draft.length === p ? '' : 'disabled'}>${ic('check')}Kiểm tra</button><span class="q-hint">Đã chọn ${study.draft.length}/${p}</span>${reportLink(q)}</div>`;
-  } else {
-    after = `<div class="after">${reportLink(q)}</div>`;
-  }
+  const opts = optButtons(q, locked, study.draft, 'pick');
+  const after = afterBlock(q, locked, study.draft, 'check');
   const done = Object.keys(study.responses).length;
   const resetConfirm = study.confirmReset ? `<div class="confirm" role="alert"><p><b>Làm lại từ đầu?</b> ${done ? `Toàn bộ ${done} câu đã làm sẽ bị xoá.` : 'Tiến độ sẽ được đặt lại.'}</p>
      <div class="acts"><button class="btn primary" data-act="doResetStudy">Làm lại</button><button class="btn" data-act="cancelReset">Huỷ</button></div></div>` : '';
@@ -180,11 +223,7 @@ function studyGo(i) {
   saveStudy();
 }
 function studyPick(k) {
-  const q = QS[study.i];
-  if (study.responses[q.n] || !letters(q).includes(k)) return;
-  if (pickOf(q) > 1) { study.draft = toggleIn(study.draft, k); return; }
-  study.responses[q.n] = [k];
-  saveStudy();
+  if (roundPick(study, QS[study.i], k)) saveStudy();
 }
 // Option buttons become disabled once answered, so focus would drop to <body>:
 // move it on to "Câu sau", or to the verdict on the last question.
@@ -192,11 +231,110 @@ function focusAfterAnswer(q) {
   if (study.responses[q.n]) focusNext = study.i === N - 1 ? '.verdict' : '[data-act="next"]';
 }
 function studyCheck() {
-  const q = QS[study.i];
-  if (study.responses[q.n] || study.draft.length !== pickOf(q)) return;
-  study.responses[q.n] = [...study.draft];
-  study.draft = [];
-  saveStudy();
+  if (roundCheck(study, QS[study.i])) saveStudy();
+}
+
+/* ---------- history ---------- */
+function renderHistory() {
+  const title = examTitle();
+  const modeActs = `<a class="btn" href="${modeUrl('study')}">${ic('book')}Ôn tập</a><a class="btn primary" href="${modeUrl('exam')}">${ic('clock')}Thi thử</a>`;
+  if (!HIST.attempts.length) {
+    return topbar(title, 'Lịch sử làm bài') + `<main class="wrap"><div class="notice"><h1>Chưa có lần làm nào</h1>
+    <p>Làm đủ ${N} câu ở Ôn tập hoặc Thi thử thì lần làm được lưu ở đây, trên trình duyệt này.</p>
+    <div class="acts-inline">${modeActs}</div></div></main>`;
+  }
+  const st = historyStats(HIST);
+  const rows = HIST.attempts.map((a, idx) => ({ a, k: idx + 1 })).reverse().map(({ a, k }) => {
+    const wrong = wrongOf(a, QS).length;
+    const res = a.mode === 'exam'
+      ? `<b class="mono">${a.score10.toFixed(2)}</b> điểm · đúng ${a.correct}/${a.total}${a.auto ? ' · hết giờ, tự nộp' : ''}`
+      : `đúng <b class="mono">${a.correct}/${a.total}</b>`;
+    return `<li class="row hrow"><span class="hnum mono" aria-label="Lần ${k}">#${k}</span>
+      <div class="meta"><div class="hl">${modeChip(a.mode)}<span class="date mono">${formatDate(a.at)}</span></div>
+        <div class="hres">${res}</div>
+        <div class="mini" aria-hidden="true"><i style="width:${(a.correct / a.total) * 100}%;background:var(--ok)"></i><i style="width:${((a.total - a.correct) / a.total) * 100}%;background:var(--bad)"></i></div></div>
+      <div class="acts">${wrong ? `<a class="btn" href="${modeUrl('review', `&amp;attempt=${k}`)}">${ic('target')}Ôn ${wrong} câu sai</a>` : `<span class="allok">${ic('check')}Không sai câu nào</span>`}</div></li>`;
+  }).join('');
+  return topbar(title, 'Lịch sử làm bài') + `<main class="wrap">
+    <div class="hist-sum">
+      <div class="tile"><span>Thi thử</span><b>${st.exams}</b><small>lần</small></div>
+      <div class="tile"><span>Cao nhất</span><b>${st.best == null ? '—' : st.best.toFixed(2)}</b><small>${st.best == null ? 'chưa thi thử' : '/10 điểm'}</small></div>
+      <div class="tile"><span>Ôn tập</span><b>${st.studies}</b><small>lần</small></div>
+    </div>
+    <h2 class="sec">Các lần làm <span class="q-hint">· mới nhất ở trên</span></h2>
+    <ol class="list hist">${rows}</ol>
+    <p class="hist-note">Lịch sử chỉ lưu trên trình duyệt này.</p>
+    <div class="row-acts">${modeActs}</div>
+  </main>`;
+}
+
+/* ---------- review wrong answers ---------- */
+// Returns null when `attempt` is not a valid 1-based index or has no wrong answers.
+function startReview(raw) {
+  const k = /^\d+$/.test(raw || '') ? Number(raw) : NaN;
+  if (!Number.isInteger(k) || k < 1 || k > HIST.attempts.length) return null;
+  const attempt = HIST.attempts[k - 1];
+  const ns = wrongOf(attempt, QS);
+  if (!ns.length) return null;
+  return { k, attempt, ns, i: 0, responses: {}, draft: [] };
+}
+const reviewQ = () => qByN(review.ns[review.i]);
+const reviewDone = () => review.ns.filter((n) => review.responses[n]).length;
+function renderReviewMissing() {
+  return topbar(examTitle(), 'Ôn câu sai', '', 'history') + `<main class="wrap"><div class="notice"><h1>Không tìm thấy lần làm này</h1>
+    <p>Lần làm này không có trong lịch sử trên trình duyệt này, hoặc không còn câu sai nào để ôn.</p>
+    <a class="btn primary" href="${modeUrl('history')}">${ic('history')}Về lịch sử</a></div></main>`;
+}
+function renderReview() {
+  if (!review) return renderReviewMissing();
+  const { k, attempt, ns } = review;
+  const Y = ns.length;
+  const q = reviewQ();
+  const locked = review.responses[q.n];
+  const done = reviewDone();
+  const correct = ns.filter((n) => review.responses[n] && isCorrect(qByN(n), review.responses[n])).length;
+  const ls = letters(q);
+  const cells = ns.map((n, i) => {
+    const x = qByN(n), r = review.responses[n];
+    let c = 'cell';
+    if (r) c += isCorrect(x, r) ? ' right' : ' wrong';
+    if (i === review.i) c += ' cur';
+    return `<button class="${c}" data-act="rgo" data-i="${i}" aria-label="Câu ${esc(n)} đề gốc${r ? (isCorrect(x, r) ? ', đúng' : ', vẫn sai') : ''}"${i === review.i ? ' aria-current="true"' : ' tabindex="-1"'}>${esc(n)}</button>`;
+  }).join('');
+  const card = done === Y ? doneCard({
+    eyebrow: `Xong ôn câu sai · lần #${k}`, ok: correct, total: Y, note: 'câu đúng · lượt này không lưu vào lịch sử',
+    acts: `<button class="btn primary" data-act="rAgain">${ic('reset')}Ôn lại</button><a class="btn" href="${modeUrl('history')}">${ic('history')}Về lịch sử</a>`,
+  }) : '';
+  return topbar(examTitle(), `Ôn câu sai · lần #${k}`, `<span class="mono" style="font-size:14px;color:var(--muted)">${done}/${Y}</span>`, 'history') +
+  `<div class="progress"><i style="width:${(done / Y) * 100}%"></i></div>` +
+  layout({
+    label: `Câu sai ${review.i + 1}/${Y} · đúng ${correct}/${done}`,
+    html: `<div class="panel-head"><b>Câu sai của lần #${k}</b><span class="q-hint">${Y} câu</span></div>
+      <p class="side-meta">${modeChip(attempt.mode)}<span class="date mono">${formatDate(attempt.at)}</span></p>
+      <div class="grid">${cells}</div>
+      <div class="keys"><span><i class="sw" style="background:var(--ok-weak);border-color:var(--ok)"></i>Đúng</span><span><i class="sw" style="background:var(--bad-weak);border-color:var(--bad);border-style:dashed"></i>Vẫn sai</span><span><i class="sw"></i>Chưa làm</span></div>
+      <p class="side-note">Số trên ô là số câu trong đề gốc. Lượt ôn này không lưu tiến độ và không tính vào lịch sử.</p>`,
+  }, `${card}
+    <article class="q">
+      <div class="q-head"><span class="q-num">Câu ${esc(q.n)}</span><span class="q-hint">đề gốc · câu sai ${review.i + 1}/${Y} · phím ${esc(ls[0] || 'A')}–${esc(ls[ls.length - 1] || 'D')}</span></div>
+      <p class="q-text">${esc(q.text)}</p>
+      <div class="opts">${optButtons(q, locked, review.draft, 'rpick')}</div>${afterBlock(q, locked, review.draft, 'rcheck')}
+    </article>
+    <div class="nav">
+      <button class="btn" data-act="rprev" ${review.i === 0 ? 'disabled' : ''}>${ic('left')}Câu trước</button>
+      <button class="btn primary" data-act="rnext" ${review.i === Y - 1 ? 'disabled' : ''}>Câu sau${ic('right')}</button>
+    </div>`);
+}
+function reviewGo(i) {
+  review.i = Math.max(0, Math.min(review.ns.length - 1, i));
+  review.draft = [];
+}
+// After locking an answer: jump to the done card when the round is complete,
+// otherwise move focus on like Ôn tập does.
+function reviewAfterAnswer(locked) {
+  if (!locked) return;
+  if (reviewDone() === review.ns.length) { focusNext = '#doneCard'; scrollTop = true; }
+  else focusNext = review.i === review.ns.length - 1 ? '.verdict' : '[data-act="rnext"]';
 }
 
 /* ---------- exam ---------- */
@@ -332,9 +470,11 @@ function render() {
   clearInterval(tick); tick = null;
   let fk = focusKey();
   // Arrow keys on a focused cell: keep focus on the (new) current cell.
-  if (fk && /^\[data-act="e?go"\]/.test(fk)) fk = '.cell.cur';
+  if (fk && /^\[data-act="[er]?go"\]/.test(fk)) fk = '.cell.cur';
   const sideTop = app.querySelector('.side-body')?.scrollTop || 0;
   app.innerHTML = (view === 'study' ? renderStudy()
+    : view === 'history' ? renderHistory()
+    : view === 'review' ? renderReview()
     : view === 'examStart' ? renderExamStart()
     : view === 'exam' ? renderExam() : renderResult()) + quizFoot();
   document.title = `${examTitle()} · MLN131`;
@@ -342,6 +482,7 @@ function render() {
   focusNext = null;
   if (want) { const el = app.querySelector(want); if (el && !el.disabled) el.focus({ preventScroll: true }); }
   keepCurInView(sideTop);
+  if (scrollTop) { scrollTop = false; window.scrollTo(0, 0); }
   if (view === 'exam') {
     tick = setInterval(() => {
       const r = remaining(), el = document.getElementById('timer');
@@ -383,6 +524,12 @@ app.addEventListener('click', (e) => {
   else if (a === 'resetStudy') { study.confirmReset = true; focusNext = '[data-act="cancelReset"]'; }
   else if (a === 'cancelReset') { study.confirmReset = false; focusNext = '[data-act="resetStudy"]'; }
   else if (a === 'doResetStudy') { study = { i: 0, responses: {}, draft: [], confirmReset: false }; saveStudy(); focusNext = '[data-act="resetStudy"]'; scroll = true; }
+  else if (a === 'rpick') reviewAfterAnswer(roundPick(review, reviewQ(), b.dataset.k));
+  else if (a === 'rcheck') reviewAfterAnswer(roundCheck(review, reviewQ()));
+  else if (a === 'rprev') { reviewGo(review.i - 1); scroll = true; }
+  else if (a === 'rnext') { reviewGo(review.i + 1); scroll = true; }
+  else if (a === 'rgo') { reviewGo(+b.dataset.i); navOpen = false; scroll = true; }
+  else if (a === 'rAgain') { review.responses = {}; review.draft = []; review.i = 0; navOpen = false; scroll = true; focusNext = '.opt'; }
   else if (a === 'epick') examPick(b.dataset.k);
   else if (a === 'eprev') { examGo(exam.i - 1); scroll = true; }
   else if (a === 'enext') { examGo(exam.i + 1); scroll = true; }
@@ -410,6 +557,12 @@ document.addEventListener('keydown', (e) => {
     else if (e.key === 'Enter' && pickOf(q) > 1 && !study.responses[q.n] && study.draft.length === pickOf(q) && e.target === document.body) { studyCheck(); focusAfterAnswer(q); render(); }
     else if (e.key === 'ArrowRight' && study.i < N - 1) { studyGo(study.i + 1); render(); }
     else if (e.key === 'ArrowLeft' && study.i > 0) { studyGo(study.i - 1); render(); }
+  } else if (view === 'review' && review) {
+    const q = reviewQ(), last = review.ns.length - 1;
+    if (k.length === 1 && letters(q).includes(k)) { reviewAfterAnswer(roundPick(review, q, k)); render(); }
+    else if (e.key === 'Enter' && pickOf(q) > 1 && !review.responses[q.n] && review.draft.length === pickOf(q) && e.target === document.body) { reviewAfterAnswer(roundCheck(review, q)); render(); }
+    else if (e.key === 'ArrowRight' && review.i < last) { reviewGo(review.i + 1); render(); }
+    else if (e.key === 'ArrowLeft' && review.i > 0) { reviewGo(review.i - 1); render(); }
   } else if (view === 'exam') {
     const q = QS[exam.order[exam.i]];
     if (k.length === 1 && letters(q).includes(k)) { if (!exam.confirm) { examPick(k); render(); } }
@@ -444,7 +597,10 @@ async function main() {
   if (!N) { notFound('Đề này chưa có câu hỏi'); return; }
   DATA.id = id; // manifest id is authoritative for storage keys and links
   study = loadStudy();
-  if (MODE === 'exam') {
+  HIST = loadHistory(DATA.id);
+  if (MODE === 'history') view = 'history';
+  else if (MODE === 'review') { review = startReview(params.get('attempt')); view = 'review'; }
+  else if (MODE === 'exam') {
     exam = loadExam();
     if (exam) {
       view = 'exam';
