@@ -196,11 +196,12 @@ a.btn.primary{color:var(--on-accent)}
 .side.open .side-body{display:block}
 .main{min-width:0}
 @media (min-width:880px){
-  .layout{grid-template-columns:288px minmax(0,1fr)}
+  .layout{grid-template-columns:320px minmax(0,1fr)}
   .side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);padding-block:24px}
   .side-toggle{display:none}
   .side-body{display:block;margin:0;max-height:calc(100vh - 56px - 48px - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain}
   .side-body .panel-head{position:sticky;top:-14px;margin:-14px -14px 10px;padding:14px 14px 10px;background:var(--surface);z-index:1}
   .side-body .panel-head{flex-wrap:nowrap}
   .side-body .panel-head .btn{min-height:36px;padding:0 10px;font-size:14px;flex:none}
+  .side-body .panel-head b{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
 }
