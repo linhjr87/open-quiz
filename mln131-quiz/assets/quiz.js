@@ -1,7 +1,7 @@
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
   loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
-  loadHistory, wrongOf, historyStats, formatDate,
+  loadHistory, wrongOf, historyStats, formatDate, makeAttempt, appendAttempt,
 } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
@@ -345,8 +345,17 @@ function renderExamStart() {
       <div class="field"><label for="mins">Thời gian<small>Đề FE thật: 60 phút</small></label><span><input class="num" id="mins" type="number" min="1" max="180" value="60"> <span style="color:var(--muted)">phút</span></span></div>
       <div class="field"><label for="shuf">Xáo trộn thứ tự câu<small>Tắt để làm đúng thứ tự đề gốc</small></label><span class="switch"><input id="shuf" type="checkbox"><span></span></span></div>
       <button class="btn primary" style="width:100%;margin-top:12px" type="submit">${ic('clock')}Bắt đầu · ${N} câu</button>
-      <ul class="rules"><li>Không hiện đáp án cho tới khi nộp bài.</li><li>Hết giờ bài sẽ tự nộp. Câu bỏ trống tính là sai.</li><li>Tải lại trang không mất bài đang làm.</li></ul>
+      <ul class="rules"><li>Không hiện đáp án cho tới khi nộp bài.</li><li>Phải làm đủ các câu mới nộp được. Hết giờ bài tự nộp, câu bỏ trống tính là sai.</li><li>Tải lại trang không mất bài đang làm.</li></ul>
     </form></main>`;
+}
+const answeredCount = () => Object.keys(exam.responses).length;
+// Next unanswered question after the current one, wrapping around in exam.order; -1 when none.
+function nextBlank() {
+  for (let s = 1; s <= N; s++) {
+    const j = (exam.i + s) % N;
+    if (!exam.responses[QS[exam.order[j]].n]) return j;
+  }
+  return -1;
 }
 const remaining = () => Math.max(0, Math.round((exam.endAt - Date.now()) / 1000));
 function renderExam() {
@@ -368,10 +377,14 @@ function renderExam() {
     return `<button class="${c}" data-act="ego" data-i="${i}" aria-label="Câu ${i + 1}${exam.responses[x.n] ? ', đã làm' : ''}${exam.flags.has(x.n) ? ', cần xem lại' : ''}"${i === exam.i ? ' aria-current="true"' : ' tabindex="-1"'}>${i + 1}</button>`;
   }).join('');
   const left = N - answered, flagged = exam.flags.size;
-  const confirm = exam.confirm ? `<div class="confirm" role="alert"><p><b>Nộp bài?</b> ${left ? `Còn ${left} câu chưa làm, sẽ tính là sai.` : 'Bạn đã làm hết các câu.'}${flagged ? ` ${flagged} câu đang đánh dấu xem lại.` : ''}</p>
+  // Submit unlocks only when every question is answered; time-out is the one exception (submit(true)).
+  const hint = left
+    ? `<div class="submit-hint" id="submitHint">${ic('warn')}<span>Còn <b>${left}</b> câu chưa làm · làm đủ mới nộp được</span><button class="btn" data-act="nextBlank">Đến câu chưa làm${ic('right')}</button></div>`
+    : `<div class="submit-hint ok">${ic('check')}<span>Đã làm đủ ${N} câu, có thể nộp bài.</span></div>`;
+  const confirm = exam.confirm && !left ? `<div class="confirm" role="alert"><p><b>Nộp bài?</b> Bạn đã làm hết ${N} câu.${flagged ? ` ${flagged} câu đang đánh dấu xem lại.` : ''}</p>
      <div class="acts"><button class="btn primary" data-act="submit">Nộp bài</button><button class="btn" data-act="cancelSubmit">Làm tiếp</button></div></div>` : '';
   return topbar(examTitle(), `Thi thử · đã làm ${answered}/${N}`,
-    `<span class="timer${r < 300 ? ' low' : ''}" id="timer" aria-live="off">${ic('clock')}${formatTime(r)}</span><button class="btn primary" data-act="askSubmit">Nộp bài</button>`) +
+    `<span class="timer${r < 300 ? ' low' : ''}" id="timer" aria-live="off">${ic('clock')}${formatTime(r)}</span><button class="btn primary" data-act="askSubmit"${left ? ' disabled aria-describedby="submitHint"' : ''}>Nộp bài</button>`) +
   `<div class="progress"><i style="width:${(answered / N) * 100}%"></i></div>` +
   layout({
     label: `Câu ${exam.i + 1}/${N} · đã làm ${answered}${flagged ? ` · ${flagged} xem lại` : ''}`,
@@ -389,6 +402,7 @@ function renderExam() {
       <button class="btn" data-act="eprev" ${exam.i === 0 ? 'disabled' : ''}>${ic('left')}Câu trước</button>
       <button class="btn primary" data-act="enext" ${exam.i === N - 1 ? 'disabled' : ''}>Câu sau${ic('right')}</button>
     </div>
+    ${hint}
     ${confirm}`);
 }
 function startExam(minutes, shuffle) {
@@ -420,10 +434,13 @@ function examGo(i) {
 }
 function submit(auto = false) {
   if (!exam || exam.submitted) return;
+  if (!auto && answeredCount() < N) return; // second lock: only the timer may submit with blanks
   exam.submitted = true;
   exam.auto = auto;
   exam.confirm = false;
   exam.result = scoreExam(QS, exam.responses);
+  exam.k = appendAttempt(DATA.id, makeAttempt('exam', QS, exam.responses, Date.now(), auto));
+  HIST = loadHistory(DATA.id);
   const key = storageKey(DATA.id, 'best');
   const prev = loadState(key, null);
   const best = typeof prev === 'number' && Number.isFinite(prev) ? Math.max(prev, exam.result.score10) : exam.result.score10;
@@ -450,13 +467,16 @@ function renderResult() {
         <div><span class="tag">Đáp án</span><span class="key">${answerLines(q, q.answer || [])}</span></div>
       </div><div class="after" style="margin-top:10px">${badge(q)}${reportLink(q)}</div></div>`;
   }).join('');
+  const acts = (wrong.length ? `<a class="btn primary" href="${modeUrl('review', `&amp;attempt=${exam.k}`)}">${ic('target')}Ôn ${wrong.length} câu sai</a>` : '') +
+    `<button class="btn${wrong.length ? '' : ' primary'}" data-act="examStart">${ic('reset')}Thi lại</button><a class="btn" href="${modeUrl('history')}">${ic('history')}Xem lịch sử</a><a class="btn ghost" href="${modeUrl('study')}">${ic('book')}Ôn tập đề này</a>`;
   return topbar(examTitle(), 'Kết quả thi thử') + `<main class="wrap">
     <div class="score"><div class="big">${res.score10.toFixed(2)}<small> /10</small></div>
-      <div class="stat">${res.correct}/${res.total} câu đúng · ${wrongFilled} sai · ${blank} bỏ trống${exam.auto ? ' · hết giờ, tự nộp' : ''}</div></div>
+      <div class="stat">${res.correct}/${res.total} câu đúng · ${wrongFilled} sai · ${blank} bỏ trống${exam.auto ? ' · hết giờ, tự nộp' : ''}<br>Lần #${exam.k} · đã lưu vào lịch sử</div></div>
     <div class="meter" aria-hidden="true"><i style="width:${(res.correct / (N || 1)) * 100}%;background:var(--ok)"></i><i style="width:${(wrongFilled / (N || 1)) * 100}%;background:var(--bad)"></i></div>
+    <div class="row-acts" style="padding-block:0 20px">${acts}</div>
     <h2 style="font-size:18px;margin:0 0 12px">${wrong.length ? `Câu sai / bỏ trống (${wrong.length})` : 'Không sai câu nào'}</h2>
     <div class="wrong-list">${items}</div>
-    <div class="row-acts"><button class="btn primary" data-act="examStart">${ic('reset')}Thi lại</button><a class="btn" href="quiz.html?exam=${encodeURIComponent(DATA.id)}&amp;mode=study">${ic('book')}Ôn tập đề này</a><a class="btn ghost" href="index.html">Về trang chủ</a></div>
+    <div class="row-acts">${acts}</div>
   </main>`;
 }
 
@@ -539,9 +559,16 @@ app.addEventListener('click', (e) => {
     if (!exam.flags.delete(n)) exam.flags.add(n);
     saveExam();
   }
-  else if (a === 'askSubmit') { exam.confirm = true; focusNext = '[data-act="submit"]'; }
+  else if (a === 'nextBlank') { const j = nextBlank(); if (j >= 0) { examGo(j); navOpen = false; scroll = true; } }
+  else if (a === 'askSubmit') {
+    if (answeredCount() < N) return; // locked until every question is answered
+    exam.confirm = true; focusNext = '[data-act="submit"]';
+  }
   else if (a === 'cancelSubmit') { exam.confirm = false; focusNext = '[data-act="askSubmit"]'; }
-  else if (a === 'submit') { submit(false); return; }
+  else if (a === 'submit') {
+    if (answeredCount() < N) exam.confirm = false; // answers were cleared while the box was open
+    else { submit(false); return; }
+  }
   render();
   if (scroll) window.scrollTo(0, 0);
   if (a === 'askSubmit') document.querySelector('.confirm')?.scrollIntoView({ block: 'center' });
