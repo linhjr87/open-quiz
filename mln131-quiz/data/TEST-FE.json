@@ -1,0 +1,61 @@
+{
+  "id": "TEST-FE",
+  "subject": "MLN131",
+  "term": "TEST",
+  "code": "FE",
+  "title": "MLN131 · TEST · FE",
+  "source": "https://fuexam.me/",
+  "questions": [
+    {
+      "n": 1,
+      "text": "Giải quyết hai vấn đề nào sau đây cần phải đặt trong mối quan hệ với cộng đồng quốc gia - dân tộc thống nhất theo định hướng xã hội chủ nghĩa?",
+      "options": {
+        "A": "Văn hóa và hội nhập quốc tế",
+        "B": "Tư sản và vô sản",
+        "C": "Giáo dục và y tế",
+        "D": "Dân tộc và tôn giáo"
+      },
+      "pick": 1,
+      "answer": ["D"],
+      "aiAnswer": ["D"],
+      "commentAnswer": ["D"],
+      "commentVotes": { "D": 3 },
+      "status": "verified",
+      "ocrNote": null
+    },
+    {
+      "n": 2,
+      "text": "Bản chất dân chủ của chế độ nước ta hiện nay được hiểu như thế nào?",
+      "options": {
+        "A": "Chế độ ta là do nhân dân làm chủ, quyền lực thuộc về nhân dân",
+        "B": "Chế độ ta là do Đảng Cộng sản Việt Nam làm chủ, là đại diện ý chí, nguyện vọng của nhân dân",
+        "C": "Chế độ ta là do giai cấp công nhân làm chủ, quyền lực thuộc về giai cấp công nhân",
+        "D": "Chế độ ta là do cá nhân làm chủ, được hiện thực hóa thông qua vai trò làm chủ duy nhất của Đảng Cộng sản Việt Nam"
+      },
+      "pick": 1,
+      "answer": ["A"],
+      "aiAnswer": ["A"],
+      "commentAnswer": ["B"],
+      "commentVotes": { "B": 2 },
+      "status": "disputed",
+      "ocrNote": null
+    },
+    {
+      "n": 3,
+      "text": "“Tôn giáo là tiếng thở dài của chúng sinh bị áp bức, là trái tim của thế giới không có trái tim.”\nChọn hai nhận định đúng về tôn giáo theo chủ nghĩa Mác - Lênin:",
+      "options": {
+        "A": "Tôn giáo là một hình thái ý thức xã hội, phản ánh hư ảo hiện thực khách quan",
+        "B": "Tôn giáo là một thiết chế xã hội phản ánh chân thật hiện thực khách quan",
+        "C": "Tôn giáo có nguồn gốc từ các điều kiện kinh tế - xã hội, nhận thức và tâm lý",
+        "D": "Tôn giáo tồn tại độc lập, không chịu tác động của điều kiện kinh tế - xã hội"
+      },
+      "pick": 2,
+      "answer": ["A", "C"],
+      "aiAnswer": ["A", "C"],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    }
+  ]
+}

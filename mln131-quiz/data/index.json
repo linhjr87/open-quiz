@@ -1,0 +1,12 @@
+{
+  "exams": [
+    {
+      "id": "TEST-FE",
+      "title": "MLN131 · TEST · FE",
+      "term": "TEST",
+      "code": "FE",
+      "count": 3,
+      "stats": { "verified": 1, "disputed": 1, "aiOnly": 1 }
+    }
+  ]
+}
