@@ -1,0 +1,1272 @@
+{
+  "id": "FA26-C2-FE",
+  "subject": "MLN131",
+  "term": "FA26",
+  "code": "C2-FE",
+  "title": "MLN131 · FA26 · C2-FE",
+  "source": null,
+  "questions": [
+    {
+      "n": 1,
+      "text": "Dân chủ xã hội chủ nghĩa có vai trò như thế nào đối với nhà nước xã hội chủ nghĩa?",
+      "options": {
+        "A": "Dân chủ xã hội chủ nghĩa tạo ra cơ chế hạn chế quyền lực của nhà nước xã hội chủ nghĩa",
+        "B": "Dân chủ xã hội chủ nghĩa là nguyên nhân sinh ra nhà nước xã hội chủ nghĩa",
+        "C": "Dân chủ xã hội chủ nghĩa là cơ sở, nền tảng cho việc xây dựng và hoạt động của nhà nước xã hội chủ nghĩa",
+        "D": "Dân chủ xã hội chủ nghĩa là phương tiện để thực hiện quyền lực nhà nước"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 2,
+      "text": "Nền dân chủ xã hội chủ nghĩa mang bản chất của giai cấp nào?",
+      "options": {
+        "A": "Giai cấp tư sản",
+        "B": "Giai cấp nông dân",
+        "C": "Giai cấp công nhân",
+        "D": "Giai cấp tiểu tư sản"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 3,
+      "text": "Căn cứ vào tính chất của quyền lực nhà nước, chức năng của nhà nước bao gồm chức năng nào sau đây?",
+      "options": {
+        "A": "Chức năng xã hội và chức năng giai cấp",
+        "B": "Chức năng đối ngoại, đối nội",
+        "C": "Chức năng kinh tế  - chính trị",
+        "D": "Chức năng văn hóa - xã hội"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 4,
+      "text": "Trong các nền dân chủ đã và đang tồn tại trong lịch sử loài người, thì nền dân chủ nào là nền dân chủ phát triển cao nhất về chất?",
+      "options": {
+        "A": "Dân chủ chủ nô",
+        "B": "Dân chủ tư sản",
+        "C": "Dân chủ xã hội chủ nghĩa",
+        "D": "Dân chủ cộng sản chủ nghĩa"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 5,
+      "text": "Hình thức dân chủ nào ở Việt Nam mà thông qua nó, người dân bằng hành động của mình thực hiện quyền làm chủ nhà nước và xã hội, không thông qua chủ thể trung gian?",
+      "options": {
+        "A": "Hình thức dân chủ trực tiếp",
+        "B": "Hình thức dân chủ gián tiếp",
+        "C": "Hình thức dân chủ đại nghị",
+        "D": "Hình thức dân chủ công khai"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 6,
+      "text": "Dân chủ xã hội chủ nghĩa đã được phôi thai từ khi nào?",
+      "options": {
+        "A": "Thực tiễn đấu tranh giai cấp ở Pháp và Công xã Pari năm 1871",
+        "B": "Thực tiễn đấu tranh giai cấp ở Việt Nam",
+        "C": "Phong trào cách mạng 1930 - 1931",
+        "D": "Thành công của cách mạng tháng 8 năm 1945"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 7,
+      "text": "Tại sao nói nhà nước xã hội chủ nghĩa là nhà nước kiểu mới?",
+      "options": {
+        "A": "Vì nó xuất hiện trễ nhất trong các kiểu nhà nước",
+        "B": "Vì bản chất của nó đối lập với các kiểu nhà nước bóc lột từng có trong lịch sử",
+        "C": "Vì do không tuân theo các quy tắc tổ chức nhà nước cổ điển",
+        "D": "Vì nó thực hiện dân chủ cho thiểu số nhân dân lao động"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 8,
+      "text": "Vấn đề: “Dân chủ là quyền lực thuộc về nhân dân, nhân dân là chủ nhân của nhà nước” được đề cập trên phương diện nào theo chủ nghĩa Mác - Lênin về dân chủ?",
+      "options": {
+        "A": "Phương diện tổ chức và quản lý xã hội",
+        "B": "Phương diện quyền lực",
+        "C": "Phương diện chế độ xã hội và trong lĩnh vực chính trị",
+        "D": "Phương diện bảo vệ xã hội"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 9,
+      "text": "Tôn giáo là một hiện tượng xã hội phản ánh sự bất lực và bế tắc của con người trước tự nhiên và xã hội, tuy nhiên, tôn giáo cũng chứa đựng một số giá trị phù hợp với đạo đức, đạo lí của con người thể hiện nội dung gì?",
+      "options": {
+        "A": "Nguồn gốc của tôn giáo",
+        "B": "Tính chất của tôn giáo",
+        "C": "Chức năng của tôn giáo",
+        "D": "Bản chất của tôn giáo"
+      },
+      "pick": 1,
+      "answer": [
+        "D"
+      ],
+      "aiAnswer": [
+        "D"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 10,
+      "text": "Về lý luận, không thể nghi ngờ gì được rằng giữa ... và  ... có một thời kỳ quá độ nhất định”. Đâu là nhóm từ còn thiếu trong dấu [...]?",
+      "options": {
+        "A": "Chủ nghĩa tư bản/ chủ nghĩa cộng sản",
+        "B": "Chủ nghĩa tư bản/ Giai cấp công nhân",
+        "C": "Nhân dân lao động/ chính quyền",
+        "D": "Chính trị/ xã hội"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": "Closing curly quote with no opening quote in source; double space before second '...' as shown"
+    },
+    {
+      "n": 11,
+      "text": "Theo quan điểm của chủ nghĩa Mác - Lê nin, sự thay thế hình thái kinh tế - xã hội tư bản chủ nghĩa bằng hình thái kinh tế - xã hội cộng sản chủ nghĩa được hiểu là gì?",
+      "options": {
+        "A": "Một sự cải biến mang tính chất chủ quan",
+        "B": "Một bước ngoặt phát triển mới, đưa nhân loại thoát khỏi lối mòn cũ",
+        "C": "Một quá trình lịch sử - tự nhiên",
+        "D": "Một quá trình can thiệp của con người bằng ý chí nhằm cải biến lịch sử theo hướng nhân văn, tích cực hơn"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 12,
+      "text": "Mâu thuẫn cơ bản và chủ yếu trong xã hội tư bản chủ nghĩa, bắt buộc nó phải được thay thế bằng hình thái kinh tế - xã hội khác phù hợp hơn là gì?",
+      "options": {
+        "A": "Mâu thuẫn giữa tính chất xã hội hóa của lực lượng sản xuất với chế độ chiếm hữu tư nhân tư bản chủ nghĩa về tư liệu sản xuất",
+        "B": "Mâu thuẫn giữa tính chất tư nhân hóa của lực lượng sản xuất với chế độ chiếm hữu tư nhân về tư liệu sản xuất",
+        "C": "Mâu thuẫn giữa tính chất chuyên môn hóa của lực lượng sản xuất với chế độ chiếm hữu tập thể tư bản chủ nghĩa về tư liệu sản xuất",
+        "D": "Mâu thuẫn giữa tính chất xã hội hóa về lực lượng sản xuất với chế độ chiếm hữu công cộng về tư liệu sản xuất"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 13,
+      "text": "Đại hội XIII của Đảng Cộng sản Việt Nam đã đề ra mục tiêu gì vào năm 2030 trên con đường xây dựng chủ nghĩa xã hội?",
+      "options": {
+        "A": "Là nước đang phát triển, có thu nhập trung bình",
+        "B": "Là nước đang phát triển, có công nghiệp hiện đại, thu nhập trung bình cao",
+        "C": "Là nước phát triển, có thu nhập trung bình cao",
+        "D": "Là nước phát triển, có thu nhập cao"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 14,
+      "text": "Thời kỳ quá độ lên chủ nghĩa xã hội ở Việt Nam là bỏ qua chế độ gì?",
+      "options": {
+        "A": "Phong kiến",
+        "B": "Tư bản chủ nghĩa",
+        "C": "Chiếm hữu nô lệ",
+        "D": "Cộng sản nguyên thủy"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 15,
+      "text": "Đại hội XIII của Đảng Cộng sản Việt Nam đã đề ra mục tiêu gì vào năm 2025 trên con đường xây dựng chủ nghĩa xã hội?",
+      "options": {
+        "A": "Là nước đang phát triển, có công nghiệp theo hướng hiện đại, vượt qua mức thu nhập trung bình thấp",
+        "B": "Là nước phát triển, có công nghiệp hóa, hiện đại hóa cao, đạt mức thu nhập cao",
+        "C": "Là nước đang phát triển, có công nghiệp theo hướng hiện đại, đạt được mức thu nhập trung bình",
+        "D": "Là nước phát triển, có thành tựu khoa học - kỹ thuật hiện đại, phát triển nguồn lực nội sinh"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 16,
+      "text": "Trong giai đoạn hiện nay, Cách mạng công nghiệp lần thứ tư đang phát triển mạnh mẽ thì vai trò của lực lượng nào trong xã hội càng trở nên quan trọng?",
+      "options": {
+        "A": "Công nhân",
+        "B": "Nông dân",
+        "C": "Trí thức",
+        "D": "Doanh nhân"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 17,
+      "text": "Đâu là một phương hướng trong việc phát huy vai trò của phụ nữ trong cơ cấu xã hội Việt Nam hiện nay?",
+      "options": {
+        "A": "Có kế hoạch chăm sóc sức khỏe sinh sản, đảm bảo quyền tự do kế hoạch hóa gia đình của phụ nữ",
+        "B": "Tăng tỷ lệ phụ nữ tham gia vào các cấp ủy và bộ máy quản lý các cấp",
+        "C": "Có chính sách ưu đãi xã hội đối với nữ giới để đảm bảo quyền bình đẳng",
+        "D": "Tăng cường đội ngũ doanh nhân nữ giới"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 18,
+      "text": "Sự biến đổi của cơ cấu xã hội - giai cấp tất yếu sẽ ảnh hưởng và tác động như thế nào đến toàn bộ cơ cấu xã hội?",
+      "options": {
+        "A": "Ảnh hưởng đến sự biến đổi của các cơ cấu xã hội",
+        "B": "Tác động đến sự biến đổi của toàn bộ cơ cấu xã hội",
+        "C": "Ảnh hưởng đến sự biến đổi của các cơ cấu xã hội khác và tác động đến sự biến đổi của toàn bộ cơ cấu xã hội",
+        "D": "Ảnh hưởng đến sự phát triển và quản lý xã hội"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 19,
+      "text": "Tại sao chủ nghĩa xã hội khoa học tập trung nghiên cứu cơ cấu xã hội - giai cấp mà không phải là các cơ cấu xã hội khác?",
+      "options": {
+        "A": "Vì cơ cấu xã hội - giai cấp là cơ cấu phổ biến rộng rãi nhất",
+        "B": "Vì bản chất của chủ nghĩa xã hội là trấn áp giai cấp",
+        "C": "Vì đó là một trong những cơ sở để nghiên cứu vấn đề liên minh giai cấp - tầng lớp trong một chế độ xã hội nhất định",
+        "D": "Vì đó là một trong những cơ sở để nghiên cứu vấn đề phân chia quyền lực trong một chế độ xã hội nhất định"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 20,
+      "text": "Trong thời kì quá độ lên chủ nghĩa xã hội, bên cạnh sự liên minh chặt chẽ trên cơ sở thống nhất lợi ích kinh tế giữa giai cấp công nhân, nông dân và trí thức, còn xuất hiện vấn đề gì?",
+      "options": {
+        "A": "Xuất hiện những mâu thuẫn lợi ích ở những mức độ khác nhau",
+        "B": "Xuất hiện sự đấu tranh kịch liệt trong hệ thống chuyên chính vô sản",
+        "C": "Xuất hiện sự chống phá của các giai cấp trong liên minh",
+        "D": "Xuất hiện sự chuyên quyền, độc đoán của một bộ phận"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 21,
+      "text": "Nội dung văn hóa - xã hội của liên minh giai cấp, tầng lớp là gì?",
+      "options": {
+        "A": "Xây dựng nền văn hóa và con người Việt Nam phát triển toàn diện",
+        "B": "Xây dựng nền văn hóa và nhà nước của dân, do dân, vì dân",
+        "C": "Xây dựng nền văn hóa và xây dựng Đảng trong sạch, vững mạnh",
+        "D": "Xây dựng nền văn hóa và tăng cường bản chất giai cấp công nhân"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 22,
+      "text": "Trong thời kì quá độ lên chủ nghĩa xã hội ở nước ta hiện nay, giai cấp nông dân có sự biến đổi theo xu hướng nào?",
+      "options": {
+        "A": "Giảm dần về số lượng và tỷ lệ trong cơ cấu xã hội - giai cấp",
+        "B": "Tăng dần về số lượng và tỷ lệ trong cơ cấu xã hội - giai cấp",
+        "C": "Giảm dần về số lượng nhưng tăng dần về tỷ lệ trong cơ cấu xã hội - giai cấp",
+        "D": "Tăng dần về số lượng nhưng giảm dần về tỷ lệ trong cơ cấu xã hội - giai cấp"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 23,
+      "text": "Phương thức căn bản và quan trọng để thực hiện và tăng cường liên minh công - nông - trí thức ở Việt Nam hiện nay là gì?",
+      "options": {
+        "A": "Đẩy mạnh công nghiệp hóa, hiện đại hóa; xây dựng nông thôn mới; phát triển kinh tế tri thức, nâng cao trình độ khoa học, công nghệ trong các ngành, lĩnh vực",
+        "B": "Đẩy mạnh nghiên cứu, sáng tạo các giải pháp mới nhằm thu hẹp nông thôn, mở rộng công nghiệp, chuyển đổi nhanh chóng cơ cấu kinh tế theo hướng dịch vụ và công nghiệp",
+        "C": "Từng bước xác lập vị trí chủ đạo của nền kinh tế tri thức và vai trò quan trọng bật nhất của đội ngũ trí thức",
+        "D": "Từng bước xác lập vị trí then chốt của kinh tế thị trường và vai trò quan trọng bật nhất của đội ngũ doanh nhân"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 24,
+      "text": "Trong 04 chức năng cơ bản của gia đình, thì chức năng nào được xem là chức năng đặc thù của gia đình?",
+      "options": {
+        "A": "Chức năng tái sản xuất ra con người",
+        "B": "Chức năng nuôi dưỡng, giáo dục",
+        "C": "Chức năng kinh tế và tổ chức tiêu dùng",
+        "D": "Chức năng thỏa mãn nhu cầu tâm sinh lý, duy trì tình cảm gia đình"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 25,
+      "text": "Hôn nhân xuất phát từ tình yêu giữa nam và nữ được xem là hôn nhân như thế nào?",
+      "options": {
+        "A": "Hôn nhân chậm tiến bộ",
+        "B": "Hôn nhân tiến bộ",
+        "C": "Hôn nhân không được đảm bảo",
+        "D": "Hôn nhân huyết thống"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 26,
+      "text": "Nơi nào được xem là cộng đồng xã hội đầu tiên mà mỗi cá nhân sinh sống?",
+      "options": {
+        "A": "Gia đình",
+        "B": "Trường học",
+        "C": "Quê hương",
+        "D": "Xã hội"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 27,
+      "text": "Với sự phát triển của hệ thống giáo dục xã hội và sự phát triển kinh tế hiện nay, vai trò giáo dục của các chủ thể trong gia đình có sự biến đổi như thế nào?",
+      "options": {
+        "A": "Vai trò giáo dục của các thành viên trong gia đình có xu hướng giảm xuống",
+        "B": "Vai trò giáo dục của các thành viên trong gia đình có xu hướng gia tăng",
+        "C": "Vai trò giáo dục của cha mẹ ngày càng được tăng cường, dành nhiều thời gian chăm sóc, giáo dục con cái hơn",
+        "D": "Vai trò giáo dục của ông bà ngày càng quan trọng hơn"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 28,
+      "text": "Gia đình có bao nhiêu chức năng cơ bản?",
+      "options": {
+        "A": "3",
+        "B": "4",
+        "C": "5",
+        "D": "6"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 29,
+      "text": "Trong gia đình Việt Nam hiện nay, người chủ gia đình là ai?",
+      "options": {
+        "A": "Người lớn tuổi nhất trong gia đình",
+        "B": "Người có trình độ cao nhất trong gia đình",
+        "C": "Người lớn tuổi nhất và có trình độ cao nhất trong gia đình",
+        "D": "Có thể là người đàn ông, người phụ nữ hoặc cả hai"
+      },
+      "pick": 1,
+      "answer": [
+        "D"
+      ],
+      "aiAnswer": [
+        "D"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 30,
+      "text": "Chức năng cơ bản nào của gia đình được xem là chức năng đặc thù nhất?",
+      "options": {
+        "A": "Chức năng nuôi dưỡng, giáo dục",
+        "B": "Chức năng kinh tế và tổ chức tiêu dùng",
+        "C": "Chức năng tái sản xuất ra con người",
+        "D": "Chức năng thỏa mãn nhu cầu tâm sinh lý, duy trì tình cảm gia đình"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 31,
+      "text": "Chức năng tái sản xuất ra con người của gia đình nên được thực hiện theo xu hướng hạn chế hay khuyến khích?",
+      "options": {
+        "A": "Cần khuyến khích phát triển để phát triển kinh tế",
+        "B": "Cần hạn chế để tránh dân số quá đông",
+        "C": "Tùy theo từng nơi, theo từng nhu cầu cụ thể của xã hội",
+        "D": "Không nên can thiệp, vì đây là chức năng tự nhiên, quyền tự do của mỗi gia đình"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 32,
+      "text": "“…nếu nghĩa vụ của vợ chồng là phải thương yêu nhau thì nghĩa vụ của những kẻ yêu nhau há chẳng phải là kết hôn với nhau và không được kết hôn với người khác hay sao?”\nNhận định trên là của ai?",
+      "options": {
+        "A": "Ph. Ăngghen",
+        "B": "V.I.Lênin",
+        "C": "Chủ tịch Hồ Chí Minh",
+        "D": "C.Mác"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 33,
+      "text": "Tính nhất nguyên về chính trị của nền dân chủ xã hội chủ nghĩa biểu hiện ở khía cạnh nào dưới đây?",
+      "options": {
+        "A": "Do Đảng Cộng sản lãnh đạo.",
+        "B": "Do toàn thể xã hội lãnh đạo.",
+        "C": "Do nhà nước lãnh đạo.",
+        "D": "Do nhân dân lãnh đạo."
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 34,
+      "text": "Trong xã hội tư bản chủ nghĩa, giai cấp nào không có lợi ích gắn với chế độ tư hữu về tư liệu sản xuất?",
+      "options": {
+        "A": "Giai cấp tư sản",
+        "B": "Giai cấp công nhân",
+        "C": "Giai cấp nô lệ",
+        "D": "Giai cấp nông dân"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 35,
+      "text": "Đặc trưng bản chất của chủ nghĩa xã hội về phương diện kinh tế là gì? Chọn các đáp án đúng.",
+      "options": {
+        "A": "Nền kinh tế phát triển cao dựa trên lực lượng sản xuất hiện đại",
+        "B": "Chế độ công hữu về tư liệu sản xuất chủ yếu",
+        "C": "Nền kinh tế phát triển cao dựa trên lực lượng sản xuất công nghiệp cơ khí",
+        "D": "Chế độ sở hữu tập thể, hỗn hợp của tư nhân và công cộng"
+      },
+      "pick": 2,
+      "answer": [
+        "A",
+        "B"
+      ],
+      "aiAnswer": [
+        "A",
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 36,
+      "text": "Theo chủ nghĩa Mác - Lênin, giai cấp vô sản không thể hoàn thành cuộc cách mạng xã hội chủ nghĩa nếu không được chuẩn bị thông qua điều gì?",
+      "options": {
+        "A": "Sự hỗ trợ từ các quốc gia khác",
+        "B": "Sự thay đổi tự nhiên của xã hội",
+        "C": "Cuộc đấu tranh của giai cấp công nhân, nông dân và tầng lớp trí thức",
+        "D": "Cuộc đấu tranh cho dân chủ"
+      },
+      "pick": 1,
+      "answer": [
+        "D"
+      ],
+      "aiAnswer": [
+        "D"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 37,
+      "text": "Sự kiện gì đánh dấu việc V.I.Lênin đã biến chủ nghĩa xã hội từ khoa học, lý luận thành hiện thực?",
+      "options": {
+        "A": "Sự ra đời của nhà nước Nga",
+        "B": "Sự chiến thắng của nước Nga trong giai đoạn chiến tranh thế giới",
+        "C": "Cách mạng tháng 10 Nga năm 1917 thành công và sự ra đời của Nhà nước Xôviết",
+        "D": "Lênin qua đời năm 1924 và sự kế vị của J. Xtalin"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 38,
+      "text": "Ba bộ phận hợp thành chủ nghĩa Mác - Lênin là gì?",
+      "options": {
+        "A": "Triết học Mác - Lênin, Kinh tế chính trị Mác - Lênin và Chủ nghĩa xã hội không tưởng phê phán",
+        "B": "Kinh tế chính trị Mác - Lênin, Tư tưởng Hồ Chí Minh và Chủ nghĩa xã hội không tưởng phê phán",
+        "C": "Triết học Mác - Lênin, Tư tưởng Hồ Chí Minh và Kinh tế chính trị học cổ điển Anh",
+        "D": "Triết học Mác - Lênin, Kinh tế chính trị Mác - Lênin và Chủ nghĩa xã hội khoa học"
+      },
+      "pick": 1,
+      "answer": [
+        "D"
+      ],
+      "aiAnswer": [
+        "D"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 39,
+      "text": "Sau Hội nghị Mátxcơva (1960), hoạt động lý luận và thực tiễn của Đảng Cộng sản và công nhân như thế nào?",
+      "options": {
+        "A": "Không phát triển",
+        "B": "Tăng cường hơn trước",
+        "C": "Bị chủ nghĩa tư bản thủ tiêu",
+        "D": "Chỉ có công nhân phát triển"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 40,
+      "text": "Ba phát kiến vĩ đại của C.Mác và Ph.Ănghen là gì?",
+      "options": {
+        "A": "Chủ nghĩa duy vật, Chủ nghĩa duy vật lịch sử, Học thuyết về giá trị thặng dư",
+        "B": "Chủ nghĩa duy vật lịch sử, Chủ nghĩa duy tâm biện chứng, Học thuyết về giá trị thặng dư",
+        "C": "Học thuyết giá trị thặng dư, Chủ nghĩa duy vật lịch sử, Phép biện chứng duy tâm",
+        "D": "Chủ nghĩa duy vật lịch sử, Học thuyết về giá trị thặng dư, Học thuyết về sứ mệnh lịch sử toàn thế giới của giai cấp công nhân"
+      },
+      "pick": 1,
+      "answer": [
+        "D"
+      ],
+      "aiAnswer": [
+        "D"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 41,
+      "text": "C.Mác và Ph.Ăngghen đánh giá: “Giai cấp tư sản trong quá trình thống trị giai cấp chưa đầy một thế kỉ đã tạo ra một lực lượng sản xuất nhiều hơn và đồ sộ hơn lực lượng của tất cả các thế hệ trước đây gộp lại” trong tác phẩm nào?",
+      "options": {
+        "A": "Chống Đuyrinh",
+        "B": "Lược khảo khoa kinh tế - chính trị",
+        "C": "Tuyên ngôn của Đảng Cộng sản",
+        "D": "Bộ Tư bản"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 42,
+      "text": "Ai đã đưa ra quan niệm “chủ nghĩa xã hội là sự phản kháng và đấu tranh chống sự bóc lột người lao động, một cuộc đấu tranh nhằm hoàn toàn xoá bỏ sự bóc lột”?",
+      "options": {
+        "A": "S.Phuriê",
+        "B": "V.I.Lênin",
+        "C": "Ph.Ănghen",
+        "D": "C.Mác"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 43,
+      "text": "Công cuộc đổi mới do Đảng Cộng sản Việt Nam khởi xướng và lãnh đạo tại Đại hội lần thứ bao nhiêu?",
+      "options": {
+        "A": "Lần thứ IV",
+        "B": "Lần thứ VI",
+        "C": "Lần thứ X",
+        "D": "Lần thứ XIII"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 44,
+      "text": "Sau khi lật đổ được giai cấp thống trị, sứ mệnh lịch sử của giai cấp công nhân không thực hiện điều gì sau đây?",
+      "options": {
+        "A": "Thiết lập nhà nước kiểu mới, mang bản chất giai cấp công nhân",
+        "B": "Xây dựng nền dân chủ xã hội chủ nghĩa",
+        "C": "Thực hiện quyền lực, quyền làm chủ của tuyệt đại đa số nhân dân lao động",
+        "D": "Tiếp tục chiến đấu giải phóng giai cấp công nhân"
+      },
+      "pick": 1,
+      "answer": [
+        "D"
+      ],
+      "aiAnswer": [
+        "D"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 45,
+      "text": "Thuật ngữ “giai cấp công nhân” được các nhà kinh điển xác định theo bao nhiêu phương diện cơ bản?",
+      "options": {
+        "A": "2",
+        "B": "3",
+        "C": "4",
+        "D": "5"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 46,
+      "text": "Cùng với sự phát triển của đại công nghiệp, các giai cấp khác đều suy tàn và tiêu vong, giai cấp nào là sản phẩm của bản thân nền đại công nghiệp?",
+      "options": {
+        "A": "Nô lệ",
+        "B": "Tư sản",
+        "C": "Công nhân",
+        "D": "Nông dân"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 47,
+      "text": "Phong trào công nhân ở Việt Nam vào thế kỉ XX cho thấy đặc trưng của giai cấp công nhân Việt Nam khác với giai cấp công nhân các nước tư bản như thế nào?",
+      "options": {
+        "A": "Giai cấp công nhân Việt Nam thể hiện đặc tính cách mạng về ý thức giai cấp và cả về ý thức dân tộc",
+        "B": "Giai cấp công nhân Việt Nam chưa hăng hái trong các phong trào đấu tranh như công nhân các nước tư bản chủ nghĩa",
+        "C": "Giai cấp công nhân Việt Nam khi ra đời chưa có sự lãnh đạo kịp thời của Đảng Cộng sản như các nước tư bản chủ nghĩa",
+        "D": "Giai cấp công nhân Việt Nam không có tinh thần cách mạng triệt để"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 48,
+      "text": "Ở Việt Nam hiện nay, tổ chức nào đại diện cho quyền lợi, lợi ích hợp pháp và là nơi để giai cấp công nhân chủ động, tích cực tham gia xây dựng, chỉnh đốn Đảng, bảo vệ chế độ xã hội chủ nghĩa, bảo vệ nhân dân?",
+      "options": {
+        "A": "Hệ thống tổ chức Công đoàn",
+        "B": "Quốc hội",
+        "C": "Mặt trận Tổ quốc Việt Nam",
+        "D": "Hội đồng nhân dân các cấp"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 49,
+      "text": "Xét trên phương diện kinh tế - xã hội, giai cấp nào là những người lao động trực tiếp hoặc gián tiếp vận hành các công cụ sản xuất cho tính chất công nghiệp ngày càng hiện đại và xã hội hóa cao?",
+      "options": {
+        "A": "Tư sản",
+        "B": "Công nhân",
+        "C": "Nông dân",
+        "D": "Địa chủ"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 50,
+      "text": "Về nội dung chính trị - xã hội, sứ mệnh lịch sử của giai cấp công nhân được thể hiện như thế nào?",
+      "options": {
+        "A": "Giai cấp công nhân cùng với nhân dân lao động dưới sự lãnh đạo của Đảng Cộng sản phải tiến hành cách mạng chính trị lật đổ quyền thống trị của giai cấp tư sản",
+        "B": "Giai cấp công nhân phải lãnh đạo được các giai cấp khác và lãnh đạo được Đảng Cộng sản để tiến hành cách mạng tư sản xóa bỏ chế độ thống trị của giai cấp tư sản",
+        "C": "Giai cấp công nhân phải cùng với nhân dân lao động lãnh đạo Đảng Cộng sản tiến hành cách mạng chính trị lật đổ chính quyền của giai cấp phong kiến",
+        "D": "Giai cấp công nhân phải xác lập được quyền thống trị nhân dân lao động và các giai cấp khác bằng cách thực hiện cách mạng lật đổ chính quyền của giai cấp tư sản"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 51,
+      "text": "Thực hiện công nghiệp hóa, gắn liền công nghiệp hóa với hiện đại hóa, đẩy mạnh công nghiệp hóa gắn với phát triển kinh tế trí thức, bảo vệ tài nguyên, môi trường là nhiệm vụ của giai cấp công nhân trên lĩnh vực nào?",
+      "options": {
+        "A": "Chính trị - xã hội",
+        "B": "Kinh tế",
+        "C": "Văn hóa",
+        "D": "Tư tưởng"
+      },
+      "pick": 1,
+      "answer": [
+        "B"
+      ],
+      "aiAnswer": [
+        "B"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 52,
+      "text": "Theo quan điểm của chủ nghĩa Mác - Lê nin, trên phương diện quyền lực, dân chủ được hiểu là gì?",
+      "options": {
+        "A": "Dân chủ là quyền lực thuộc về nhân dân",
+        "B": "Dân chủ là một hình thái nhà nước của giai cấp cầm quyền",
+        "C": "Dân chủ là quyền tự do của nhân dân",
+        "D": "Dân chủ là một nguyên tắc - nguyên tắc dân chủ"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 53,
+      "text": "Ở nước ta, các dân tộc thiểu số phân bố chủ yếu ở các địa bàn có đặc điểm như thế nào?",
+      "options": {
+        "A": "Có vị trí chiến lược quan trọng",
+        "B": "Có điều kiện phát triển kinh tế - xã hội tốt nhất",
+        "C": "Ở đồng bằng trù phú",
+        "D": "Ở các hải đảo xa xôi"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 54,
+      "text": "Theo quan điểm của chủ nghĩa Mác - Lênin, về bản chất, tôn giáo do ai sáng tạo ra?",
+      "options": {
+        "A": "Chúa trời",
+        "B": "Đức Phật",
+        "C": "Các thế lực siêu nhiên",
+        "D": "Con người"
+      },
+      "pick": 1,
+      "answer": [
+        "D"
+      ],
+      "aiAnswer": [
+        "D"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 55,
+      "text": "Để tăng cường, củng cố khối đại đoàn kết dân tộc ở nước ta hiện nay thì chính sách cụ thể nào của Đảng và Nhà nước ta được coi là vấn đề cực kỳ quan trọng?",
+      "options": {
+        "A": "Ưu tiên đầu tư phát triển kinh tế - xã hội các vùng dân tộc và miền núi",
+        "B": "Tôn trọng lợi ích, truyền thống, văn hoá của các dân tộc",
+        "C": "Phát huy truyền thống đoàn kết giữa các dân tộc",
+        "D": "Tăng cường bồi dưỡng, đào tạo đội ngũ cán bộ là người dân tộc thiểu số"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 56,
+      "text": "Trong các nội dung sau, đâu là nội dung Cương lĩnh dân tộc của chủ nghĩa Mác - Lênin?",
+      "options": {
+        "A": "Các dân tộc hoàn toàn bình đẳng, các dân tộc được quyền tự quyết, liên hiệp công nhân tất cả các dân tộc lại",
+        "B": "Các dân tộc đoàn kết, bình đẳng và liên hiệp công nhân tất cả các dân tộc lại",
+        "C": "Các dân tộc có quyền tự quyết, liên hiệp công nhân tất cả các dân tộc lại",
+        "D": "Liên hiệp công nhân tất cả các dân tộc lại"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 57,
+      "text": "Theo cương lĩnh dân tộc của chủ nghĩa Mác - Lênin, trong các nội dung của quyền dân tộc tự quyết thì nội dung nào được coi là cơ bản nhất, tiên quyết nhất?",
+      "options": {
+        "A": "Tự quyết về chính trị",
+        "B": "Tự quyết về văn hoá",
+        "C": "Tự quyết về kinh tế",
+        "D": "Tự quyết về lãnh thổ"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 58,
+      "text": "Các tôn giáo ở nước ta có đặc điểm tồn tại như thế nào trong lòng quốc gia - dân tộc?",
+      "options": {
+        "A": "Đa dạng, đan xen, chung sống hòa bình và không có xung đột, chiến tranh tôn giáo",
+        "B": "Đa dạng, đan xen, cạnh tranh với nhau",
+        "C": "Đa dạng, đan xen, đấu tranh với nhau để giành vị trí thống trị",
+        "D": "Thống nhất dưới sự thống trị của Đảng Cộng sản Việt Nam"
+      },
+      "pick": 1,
+      "answer": [
+        "A"
+      ],
+      "aiAnswer": [
+        "A"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 59,
+      "text": "Nội dung cốt lõi của công tác tôn giáo ở nước ta hiện nay là gì?",
+      "options": {
+        "A": "Công tác giáo dục chủ nghĩa duy vật biện chứng",
+        "B": "Công tác cảm hóa giáo dân",
+        "C": "Công tác vận động quần chúng",
+        "D": "Công tác điều hòa mâu thuẫn giữa các tôn giáo"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    },
+    {
+      "n": 60,
+      "text": "Chính sách dân tộc của nước ta về chính trị hướng tới đảm bảo đại đoàn kết toàn dân tộc thống nhất vì mục tiêu chung là gì?",
+      "options": {
+        "A": "Lợi ích kinh tế",
+        "B": "Điều hòa mâu thuẫn giữa các dân tộc",
+        "C": "Dân giàu, nước mạnh, dân chủ, công bằng, văn minh",
+        "D": "Lợi ích thiết thân của từng dân tộc"
+      },
+      "pick": 1,
+      "answer": [
+        "C"
+      ],
+      "aiAnswer": [
+        "C"
+      ],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    }
+  ]
+}
