@@ -212,3 +212,13 @@ export function formatDate(ms) {
   const mm = String(d.getMonth() + 1).padStart(2, '0');
   return `${dd}/${mm}/${d.getFullYear()}`;
 }
+
+// Keyboard answer: a letter key (any case) or a digit 1..n picks the n-th option.
+// Returns the option letter, or null when the key does not map to an option.
+export function keyToLetter(key, letters) {
+  if (typeof key !== 'string' || key.length !== 1) return null;
+  const up = key.toUpperCase();
+  if (letters.includes(up)) return up;
+  if (up >= '1' && up <= '9') return letters[Number(up) - 1] ?? null;
+  return null;
+}

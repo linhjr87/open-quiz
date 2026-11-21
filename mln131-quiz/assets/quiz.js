@@ -1,6 +1,6 @@
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
-  loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
+  loadState, saveState, formatTime, shuffled, storageKey, formatVotes, keyToLetter,
   loadHistory, wrongOf, historyStats, formatDate, bestOf, makeAttempt, appendAttempt, expireIfIdle,
 } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
@@ -61,9 +61,15 @@ function topbar(title, sub, right = '', back = 'home') {
 function answerLines(q, ls) {
   return ls.map((l) => `<span class="v"><b>${esc(l)}.</b> ${esc((q.options || {})[l])}</span>`).join('');
 }
+// "phím A–D hoặc 1–4" (digits only up to 9 options)
+function keyHint(ls) {
+  const n = ls.length;
+  const range = `phím ${esc(ls[0] || 'A')}–${esc(ls[n - 1] || 'D')}`;
+  return n >= 1 && n <= 9 ? `${range} hoặc 1–${n}` : range;
+}
 function hintStudy(q) {
   const p = pickOf(q), ls = letters(q);
-  return `Chọn ${p} đáp án · phím ${esc(ls[0] || 'A')}–${esc(ls[ls.length - 1] || 'D')}${p > 1 ? ' để chọn/bỏ chọn' : ''}`;
+  return `Chọn ${p} đáp án · ${keyHint(ls)}${p > 1 ? ' để chọn/bỏ chọn' : ''}`;
 }
 function toggleIn(arr, k) {
   return arr.includes(k) ? arr.filter((x) => x !== k) : [...arr, k];
@@ -351,7 +357,7 @@ function renderReview() {
       <p class="side-note">Số trên ô là số câu trong đề gốc. Lượt ôn này không lưu tiến độ và không tính vào lịch sử.</p>`,
   }, `${card}
     <article class="q">
-      <div class="q-head"><span class="q-num">Câu ${esc(q.n)}</span><span class="q-hint">đề gốc · câu sai ${review.i + 1}/${Y} · phím ${esc(ls[0] || 'A')}–${esc(ls[ls.length - 1] || 'D')}</span></div>
+      <div class="q-head"><span class="q-num">Câu ${esc(q.n)}</span><span class="q-hint">đề gốc · câu sai ${review.i + 1}/${Y} · ${keyHint(ls)}</span></div>
       <p class="q-text">${esc(q.text)}</p>
       <div class="opts">${optButtons(q, locked, review.draft, 'rpick')}</div>${afterBlock(q, locked, review.draft, 'rcheck')}
     </article>
@@ -430,7 +436,7 @@ function renderExam() {
       <div class="keys"><span><i class="sw" style="background:var(--accent-weak);border-color:var(--accent)"></i>Đã làm</span><span><i class="sw" style="background:var(--warn);border-color:var(--warn)"></i>Xem lại</span><span><i class="sw"></i>Chưa làm</span></div>`,
   }, `
     <article class="q">
-      <div class="q-head"><span class="q-num">Câu ${exam.i + 1}/${N}</span><span class="q-hint">(Choose ${p} answer${p > 1 ? 's' : ''}) · Chọn ${p} đáp án · phím ${esc(letters(q)[0] || 'A')}–${esc(letters(q)[letters(q).length - 1] || 'D')}</span><span class="spacer"></span>
+      <div class="q-head"><span class="q-num">Câu ${exam.i + 1}/${N}</span><span class="q-hint">(Choose ${p} answer${p > 1 ? 's' : ''}) · Chọn ${p} đáp án · ${keyHint(letters(q))}</span><span class="spacer"></span>
         <button class="btn flagbtn${exam.flags.has(q.n) ? ' on' : ''}" data-act="flag" aria-pressed="${exam.flags.has(q.n)}">${ic('flag')}Xem lại</button></div>
       <p class="q-text">${esc(q.text)}</p>
       <div class="opts">${opts}</div>
@@ -616,22 +622,21 @@ document.addEventListener('keydown', (e) => {
   if (e.target.closest && e.target.closest('input,textarea')) return;
   if (e.ctrlKey || e.metaKey || e.altKey) return;
   if (!DATA || !QS.length) return; // data not loaded, or exam not found
-  const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
   if (view === 'study') {
-    const q = QS[study.i];
-    if (k.length === 1 && letters(q).includes(k)) { afterStudyLock(studyPick(k), q); render(); }
+    const q = QS[study.i], k = keyToLetter(e.key, letters(q));
+    if (k) { afterStudyLock(studyPick(k), q); render(); }
     else if (e.key === 'Enter' && pickOf(q) > 1 && !study.responses[q.n] && study.draft.length === pickOf(q) && e.target === document.body) { afterStudyLock(studyCheck(), q); render(); }
     else if (e.key === 'ArrowRight' && study.i < N - 1) { studyGo(study.i + 1); render(); }
     else if (e.key === 'ArrowLeft' && study.i > 0) { studyGo(study.i - 1); render(); }
   } else if (view === 'review' && review) {
-    const q = reviewQ(), last = review.ns.length - 1;
-    if (k.length === 1 && letters(q).includes(k)) { reviewAfterAnswer(roundPick(review, q, k)); render(); }
+    const q = reviewQ(), last = review.ns.length - 1, k = keyToLetter(e.key, letters(q));
+    if (k) { reviewAfterAnswer(roundPick(review, q, k)); render(); }
     else if (e.key === 'Enter' && pickOf(q) > 1 && !review.responses[q.n] && review.draft.length === pickOf(q) && e.target === document.body) { reviewAfterAnswer(roundCheck(review, q)); render(); }
     else if (e.key === 'ArrowRight' && review.i < last) { reviewGo(review.i + 1); render(); }
     else if (e.key === 'ArrowLeft' && review.i > 0) { reviewGo(review.i - 1); render(); }
   } else if (view === 'exam') {
-    const q = QS[exam.order[exam.i]];
-    if (k.length === 1 && letters(q).includes(k)) { if (!exam.confirm) { examPick(k); render(); } }
+    const q = QS[exam.order[exam.i]], k = keyToLetter(e.key, letters(q));
+    if (k) { if (!exam.confirm) { examPick(k); render(); } }
     else if (e.key === 'ArrowRight' && exam.i < N - 1) { examGo(exam.i + 1); render(); }
     else if (e.key === 'ArrowLeft' && exam.i > 0) { examGo(exam.i - 1); render(); }
   }

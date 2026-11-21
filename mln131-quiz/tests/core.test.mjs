@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
-  loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
+  loadState, saveState, formatTime, shuffled, storageKey, formatVotes, keyToLetter,
   expireIfIdle, sanitizeHistory, loadHistory, appendAttempt, makeAttempt, wrongOf, historyStats, formatDate, bestOf,
 } from '../assets/core.js';
 
@@ -245,4 +245,18 @@ test('bestOf merges the legacy best key with the history best', () => {
     assert.equal(bestOf('J', hist(null)), null);         // non-numeric legacy ignored
     assert.equal(bestOf('J', hist(5)), 5);
   });
+});
+
+test('keyToLetter maps letters (any case) and digits 1..n to option letters', () => {
+  const ls = ['A', 'B', 'C', 'D'];
+  assert.equal(keyToLetter('a', ls), 'A');
+  assert.equal(keyToLetter('D', ls), 'D');
+  assert.equal(keyToLetter('1', ls), 'A');
+  assert.equal(keyToLetter('4', ls), 'D');
+  assert.equal(keyToLetter('5', ls), null);
+  assert.equal(keyToLetter('0', ls), null);
+  assert.equal(keyToLetter('E', ls), null);
+  assert.equal(keyToLetter('Enter', ls), null);
+  assert.equal(keyToLetter('3', ['A', 'B', 'C', 'D', 'E']), 'C');
+  assert.equal(keyToLetter('1', []), null);
 });
