@@ -1,4 +1,4 @@
-/* Layout: one reading column (max 760px) under a sticky bar. Theme: Dong Son bronze drum: patina green for interaction, bronze for ornament (drum face in the hero), rice-paper ground, lacquer red rule on each question. */
+/* Layout: one reading column (max 760px) under a sticky bar; quiz views add a left question-list sidebar (max 1120px, collapses on narrow screens). Theme: Dong Son bronze drum: patina green for interaction, bronze for ornament (drum face in the hero), rice-paper ground, lacquer red rule on each question. */
 :root{
   --bg:#F4EFE4; --surface:#FFFCF6; --sunken:#ECE4D3; --line:#DCD0B8; --fg:#2B2116; --muted:#6A5A44;
   --accent:#1F5E58; --accent-weak:#E1EEEA; --on-accent:#FBF7EE;
@@ -186,3 +186,21 @@ a.btn.primary{color:var(--on-accent)}
 .notice p{margin:0 0 16px;color:var(--muted)}
 .disclaimer{margin:14px 0 0;font-size:13px;color:var(--muted);max-width:60ch}
 .stage{min-height:60vh}
+
+/* quiz layout: question list in a left sidebar, question on the right */
+.wrap.wide{max-width:1120px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:0 32px;align-items:start}
+.side{padding-top:16px}
+.side-toggle{width:100%;justify-content:flex-start;font-size:14px}
+.side-body{display:none;margin:8px 0 0}
+.side.open .side-body{display:block}
+.main{min-width:0}
+@media (min-width:880px){
+  .layout{grid-template-columns:288px minmax(0,1fr)}
+  .side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);padding-block:24px}
+  .side-toggle{display:none}
+  .side-body{display:block;margin:0;max-height:calc(100vh - 56px - 48px - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain}
+  .side-body .panel-head{position:sticky;top:-14px;margin:-14px -14px 10px;padding:14px 14px 10px;background:var(--surface);z-index:1}
+  .side-body .panel-head{flex-wrap:nowrap}
+  .side-body .panel-head .btn{min-height:36px;padding:0 10px;font-size:14px;flex:none}
+}

@@ -18,6 +18,7 @@ let study = { i: 0, responses: {}, draft: [], confirmReset: false };
 let exam = null;       // {i, responses, flags:Set, order, endAt, minutes, submitted, confirm, auto, result}
 let tick = null;
 let focusNext = null; // selector to focus after the next render
+let navOpen = false;  // question list expanded (narrow screens only)
 
 const qByN = (n) => QS.find((q) => q.n === n);
 const letters = (q) => Object.keys(q.options || {});
@@ -25,6 +26,7 @@ const pickOf = (q) => (Number.isInteger(q.pick) && q.pick > 0 ? q.pick : (q.answ
 const examTitle = () => (DATA.term && DATA.code ? `${DATA.term} · ${DATA.code}` : DATA.title || DATA.id);
 
 /* ---------- small helpers ---------- */
+const isSplit = () => view === 'study' || view === 'exam';
 function badge(q) {
   const aiKey = [...(q.aiAnswer || q.answer || [])].sort().join('');
   const dist = esc(formatVotes(q.commentVotes, aiKey));
@@ -42,10 +44,10 @@ function reportLink(q) {
   return `<a class="report" href="https://github.com/${REPO}/issues/new?title=${title}" target="_blank" rel="noopener">${ic('msg')}Báo lỗi câu này</a>`;
 }
 function quizFoot() {
-  return `<footer class="wrap foot">Không chính thức — đáp án có thể sai · <a href="https://github.com/${REPO}/issues" target="_blank" rel="noopener">Báo lỗi</a></footer>`;
+  return `<footer class="wrap${isSplit() ? ' wide' : ''} foot">Không chính thức — đáp án có thể sai · <a href="https://github.com/${REPO}/issues" target="_blank" rel="noopener">Báo lỗi</a></footer>`;
 }
 function topbar(title, sub, right = '') {
-  return `<header class="bar"><div class="wrap">
+  return `<header class="bar"><div class="wrap${isSplit() ? ' wide' : ''}">
     <a class="iconbtn" href="index.html" aria-label="Về trang chủ">${ic('back')}</a>
     <div class="bar-title"><b>${esc(title)}</b><span>${esc(sub)}</span></div>
     <div class="spacer"></div>${right}</div></header>`;
@@ -59,6 +61,17 @@ function hintStudy(q) {
 }
 function toggleIn(arr, k) {
   return arr.includes(k) ? arr.filter((x) => x !== k) : [...arr, k];
+}
+// Question list in a left sidebar (collapsible on narrow screens). Only the
+// current cell is in the tab order; arrow keys move between questions.
+function layout(side, body) {
+  return `<div class="wrap wide layout">
+    <aside class="side${navOpen ? ' open' : ''}" aria-label="Danh sách câu">
+      <button class="btn side-toggle" data-act="toggleNav" aria-expanded="${navOpen}" aria-controls="qnav">${ic('grid')}<span>${side.label}</span><span class="spacer"></span>${ic(navOpen ? 'up' : 'down')}</button>
+      <section class="panel side-body" id="qnav">${side.html}</section>
+    </aside>
+    <main class="main">${body}</main>
+  </div>`;
 }
 const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x));
 
@@ -139,11 +152,17 @@ function renderStudy() {
     let c = 'cell';
     if (r) c += isCorrect(x, r) ? ' right' : ' wrong';
     if (i === study.i) c += ' cur';
-    return `<button class="${c}" data-act="go" data-i="${i}" aria-label="Câu ${esc(x.n)}${r ? (isCorrect(x, r) ? ', đúng' : ', sai') : ''}"${i === study.i ? ' aria-current="true"' : ''}>${esc(x.n)}</button>`;
+    return `<button class="${c}" data-act="go" data-i="${i}" aria-label="Câu ${esc(x.n)}${r ? (isCorrect(x, r) ? ', đúng' : ', sai') : ''}"${i === study.i ? ' aria-current="true"' : ' tabindex="-1"'}>${esc(x.n)}</button>`;
   }).join('');
   return topbar(examTitle(), 'Ôn tập', `<span class="mono" style="font-size:14px;color:var(--muted)">${done}/${N}</span>`) +
-  `<div class="progress"><i style="width:${(done / N) * 100}%"></i></div>
-  <main class="wrap">
+  `<div class="progress"><i style="width:${(done / N) * 100}%"></i></div>` +
+  layout({
+    label: `Câu ${esc(q.n)}/${N} · đúng ${correct}/${done}`,
+    html: `<div class="panel-head"><b>Đúng ${correct}/${done} câu đã làm</b><button class="btn ghost" data-act="resetStudy">${ic('reset')}Làm lại</button></div>
+      ${resetConfirm}
+      <div class="grid">${cells}</div>
+      <div class="keys"><span><i class="sw" style="background:var(--ok-weak);border-color:var(--ok)"></i>Đúng</span><span><i class="sw" style="background:var(--bad-weak);border-color:var(--bad);border-style:dashed"></i>Sai</span><span><i class="sw"></i>Chưa làm</span></div>`,
+  }, `
     <article class="q">
       <div class="q-head"><span class="q-num">Câu ${esc(q.n)}/${N}</span><span class="q-hint">${hintStudy(q)}</span></div>
       <p class="q-text">${esc(q.text)}</p>
@@ -152,14 +171,7 @@ function renderStudy() {
     <div class="nav">
       <button class="btn" data-act="prev" ${study.i === 0 ? 'disabled' : ''}>${ic('left')}Câu trước</button>
       <button class="btn primary" data-act="next" ${study.i === N - 1 ? 'disabled' : ''}>Câu sau${ic('right')}</button>
-    </div>
-    <section class="panel">
-      <div class="panel-head"><b>Đúng ${correct}/${done} câu đã làm</b><button class="btn ghost" data-act="resetStudy">${ic('reset')}Làm lại</button></div>
-      ${resetConfirm}
-      <div class="grid">${cells}</div>
-      <div class="keys"><span><i class="sw" style="background:var(--ok-weak);border-color:var(--ok)"></i>Đúng</span><span><i class="sw" style="background:var(--bad-weak);border-color:var(--bad);border-style:dashed"></i>Sai</span><span><i class="sw"></i>Chưa làm</span></div>
-    </section>
-  </main>`;
+    </div>`);
 }
 function studyGo(i) {
   study.i = Math.max(0, Math.min(N - 1, i));
@@ -215,15 +227,20 @@ function renderExam() {
     if (exam.responses[x.n]) c += ' done';
     if (exam.flags.has(x.n)) c += ' flag';
     if (i === exam.i) c += ' cur';
-    return `<button class="${c}" data-act="ego" data-i="${i}" aria-label="Câu ${i + 1}${exam.responses[x.n] ? ', đã làm' : ''}${exam.flags.has(x.n) ? ', cần xem lại' : ''}"${i === exam.i ? ' aria-current="true"' : ''}>${i + 1}</button>`;
+    return `<button class="${c}" data-act="ego" data-i="${i}" aria-label="Câu ${i + 1}${exam.responses[x.n] ? ', đã làm' : ''}${exam.flags.has(x.n) ? ', cần xem lại' : ''}"${i === exam.i ? ' aria-current="true"' : ' tabindex="-1"'}>${i + 1}</button>`;
   }).join('');
   const left = N - answered, flagged = exam.flags.size;
   const confirm = exam.confirm ? `<div class="confirm" role="alert"><p><b>Nộp bài?</b> ${left ? `Còn ${left} câu chưa làm, sẽ tính là sai.` : 'Bạn đã làm hết các câu.'}${flagged ? ` ${flagged} câu đang đánh dấu xem lại.` : ''}</p>
      <div class="acts"><button class="btn primary" data-act="submit">Nộp bài</button><button class="btn" data-act="cancelSubmit">Làm tiếp</button></div></div>` : '';
   return topbar(examTitle(), `Thi thử · đã làm ${answered}/${N}`,
     `<span class="timer${r < 300 ? ' low' : ''}" id="timer" aria-live="off">${ic('clock')}${formatTime(r)}</span><button class="btn primary" data-act="askSubmit">Nộp bài</button>`) +
-  `<div class="progress"><i style="width:${(answered / N) * 100}%"></i></div>
-  <main class="wrap">
+  `<div class="progress"><i style="width:${(answered / N) * 100}%"></i></div>` +
+  layout({
+    label: `Câu ${exam.i + 1}/${N} · đã làm ${answered}${flagged ? ` · ${flagged} xem lại` : ''}`,
+    html: `<div class="panel-head"><b>Danh sách câu</b><span class="q-hint">${answered}/${N} đã làm</span></div>
+      <div class="grid">${cells}</div>
+      <div class="keys"><span><i class="sw" style="background:var(--accent-weak);border-color:var(--accent)"></i>Đã làm</span><span><i class="sw" style="background:var(--warn);border-color:var(--warn)"></i>Xem lại</span><span><i class="sw"></i>Chưa làm</span></div>`,
+  }, `
     <article class="q">
       <div class="q-head"><span class="q-num">Câu ${exam.i + 1}/${N}</span><span class="q-hint">(Choose ${p} answer${p > 1 ? 's' : ''}) · Chọn ${p} đáp án · phím ${esc(letters(q)[0] || 'A')}–${esc(letters(q)[letters(q).length - 1] || 'D')}</span><span class="spacer"></span>
         <button class="btn flagbtn${exam.flags.has(q.n) ? ' on' : ''}" data-act="flag" aria-pressed="${exam.flags.has(q.n)}">${ic('flag')}Xem lại</button></div>
@@ -234,13 +251,7 @@ function renderExam() {
       <button class="btn" data-act="eprev" ${exam.i === 0 ? 'disabled' : ''}>${ic('left')}Câu trước</button>
       <button class="btn primary" data-act="enext" ${exam.i === N - 1 ? 'disabled' : ''}>Câu sau${ic('right')}</button>
     </div>
-    ${confirm}
-    <section class="panel" style="margin-top:16px">
-      <div class="panel-head"><b>Danh sách câu</b></div>
-      <div class="grid">${cells}</div>
-      <div class="keys"><span><i class="sw" style="background:var(--accent-weak);border-color:var(--accent)"></i>Đã làm</span><span><i class="sw" style="background:var(--warn);border-color:var(--warn)"></i>Xem lại</span><span><i class="sw"></i>Chưa làm</span></div>
-    </section>
-  </main>`;
+    ${confirm}`);
 }
 function startExam(minutes, shuffle) {
   const idx = [...Array(N).keys()];
@@ -319,7 +330,10 @@ function focusKey() {
 }
 function render() {
   clearInterval(tick); tick = null;
-  const fk = focusKey();
+  let fk = focusKey();
+  // Arrow keys on a focused cell: keep focus on the (new) current cell.
+  if (fk && /^\[data-act="e?go"\]/.test(fk)) fk = '.cell.cur';
+  const sideTop = app.querySelector('.side-body')?.scrollTop || 0;
   app.innerHTML = (view === 'study' ? renderStudy()
     : view === 'examStart' ? renderExamStart()
     : view === 'exam' ? renderExam() : renderResult()) + quizFoot();
@@ -327,6 +341,7 @@ function render() {
   const want = focusNext || fk;
   focusNext = null;
   if (want) { const el = app.querySelector(want); if (el && !el.disabled) el.focus({ preventScroll: true }); }
+  keepCurInView(sideTop);
   if (view === 'exam') {
     tick = setInterval(() => {
       const r = remaining(), el = document.getElementById('timer');
@@ -343,6 +358,16 @@ function render() {
     render(); window.scrollTo(0, 0);
   });
 }
+// innerHTML resets the sidebar's own scroll; restore it, then nudge so the
+// current cell stays visible without scrolling the window.
+function keepCurInView(top) {
+  const box = app.querySelector('.side-body'), cur = box && box.querySelector('.cell.cur');
+  if (!box || box.scrollHeight <= box.clientHeight) return;
+  box.scrollTop = top;
+  const pad = 8, y = cur.offsetTop - box.offsetTop;
+  if (y < box.scrollTop + pad) box.scrollTop = y - pad;
+  else if (y + cur.offsetHeight > box.scrollTop + box.clientHeight - pad) box.scrollTop = y + cur.offsetHeight - box.clientHeight + pad;
+}
 app.addEventListener('click', (e) => {
   const b = e.target.closest('[data-act]');
   if (!b || b.disabled) return;
@@ -353,14 +378,15 @@ app.addEventListener('click', (e) => {
   else if (a === 'check') { studyCheck(); focusAfterAnswer(QS[study.i]); }
   else if (a === 'prev') { studyGo(study.i - 1); scroll = true; }
   else if (a === 'next') { studyGo(study.i + 1); scroll = true; }
-  else if (a === 'go') { studyGo(+b.dataset.i); scroll = true; }
+  else if (a === 'go') { studyGo(+b.dataset.i); navOpen = false; scroll = true; }
+  else if (a === 'toggleNav') navOpen = !navOpen;
   else if (a === 'resetStudy') { study.confirmReset = true; focusNext = '[data-act="cancelReset"]'; }
   else if (a === 'cancelReset') { study.confirmReset = false; focusNext = '[data-act="resetStudy"]'; }
   else if (a === 'doResetStudy') { study = { i: 0, responses: {}, draft: [], confirmReset: false }; saveStudy(); focusNext = '[data-act="resetStudy"]'; scroll = true; }
   else if (a === 'epick') examPick(b.dataset.k);
   else if (a === 'eprev') { examGo(exam.i - 1); scroll = true; }
   else if (a === 'enext') { examGo(exam.i + 1); scroll = true; }
-  else if (a === 'ego') { examGo(+b.dataset.i); scroll = true; }
+  else if (a === 'ego') { examGo(+b.dataset.i); navOpen = false; scroll = true; }
   else if (a === 'flag') {
     const n = QS[exam.order[exam.i]].n;
     if (!exam.flags.delete(n)) exam.flags.add(n);
@@ -394,6 +420,7 @@ document.addEventListener('keydown', (e) => {
 
 /* ---------- boot ---------- */
 function notFound(msg) {
+  view = 'none';
   document.title = 'Không tìm thấy đề · MLN131';
   app.innerHTML = `<header class="bar"><div class="wrap"><div class="brand">${drumSvg(26, 'star', true)}<span class="mark">MLN131</span>Phòng thi thử</div></div></header>
     <main class="wrap"><div class="notice"><h1>${esc(msg)}</h1><p>Đề này không có trong danh sách hoặc không tải được.</p><a class="btn primary" href="index.html">${ic('back')}Về trang chủ</a></div></main>${quizFoot()}`;
