@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
   loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
+  expireIfIdle, sanitizeHistory, loadHistory, appendAttempt, makeAttempt, wrongOf, historyStats, formatDate,
 } from '../assets/core.js';
 
 const manifest = { exams: [{ id: 'FA24-FE' }, { id: 'SP25-B5' }] };
@@ -21,6 +22,9 @@ function fakeStorage(initial = {}) {
     data,
     getItem: (k) => (k in data ? data[k] : null),
     setItem: (k, v) => { data[k] = String(v); },
+    removeItem: (k) => { delete data[k]; },
+    key: (i) => Object.keys(data)[i] ?? null,
+    get length() { return Object.keys(data).length; },
   };
 }
 
@@ -148,4 +152,78 @@ test('formatVotes returns an empty string for null, empty or junk votes', () => 
   assert.equal(formatVotes({}, 'A'), '');
   assert.equal(formatVotes(['A'], 'A'), '');
   assert.equal(formatVotes({ A: 'x', B: 2 }, 'A'), 'B 2');
+});
+
+const qs3 = [
+  { n: 1, options: { A: '', B: '' }, answer: ['A'] },
+  { n: 2, options: { A: '', B: '' }, answer: ['B'] },
+  { n: 3, options: { A: '', B: '', C: '' }, answer: ['A', 'C'] },
+];
+const DAY = 86400000;
+
+test('expireIfIdle wipes only mln131: keys after more than 7 days idle', () => {
+  const st = fakeStorage({ 'mln131:lastSeen': String(0), 'mln131:X:history': '{}', 'other:key': '1' });
+  assert.equal(expireIfIdle(7 * DAY + 1, st), true);
+  assert.deepEqual(Object.keys(st.data).sort(), ['mln131:lastSeen', 'other:key']);
+  assert.equal(JSON.parse(st.data['mln131:lastSeen']), 7 * DAY + 1);
+});
+test('expireIfIdle keeps data at exactly 7 days and when lastSeen is missing', () => {
+  const a = fakeStorage({ 'mln131:lastSeen': '0', 'mln131:X:study': '{}' });
+  assert.equal(expireIfIdle(7 * DAY, a), false);
+  assert.ok('mln131:X:study' in a.data);
+  const b = fakeStorage({ 'mln131:X:study': '{}' });
+  assert.equal(expireIfIdle(123, b), false);
+  assert.ok('mln131:X:study' in b.data);
+  assert.equal(JSON.parse(b.data['mln131:lastSeen']), 123);
+});
+test('expireIfIdle returns false when storage throws', () => {
+  const bad = { get length() { throw new Error('x'); }, getItem() { throw new Error('x'); }, setItem() { throw new Error('x'); } };
+  assert.equal(expireIfIdle(1, bad), false);
+});
+test('makeAttempt: exam carries score10 and auto only when auto', () => {
+  const r = { 1: ['A'], 2: ['A'] }; // 1 right, 2 wrong, 3 blank
+  assert.deepEqual(makeAttempt('exam', qs3, r, 5, true),
+    { mode: 'exam', at: 5, correct: 1, total: 3, score10: 3.33, auto: true, responses: { 1: ['A'], 2: ['A'] } });
+  assert.equal('auto' in makeAttempt('exam', qs3, r, 5), false);
+  const s = makeAttempt('study', qs3, { 1: ['A'], 2: ['B'], 3: ['A', 'C'] }, 9);
+  assert.deepEqual(s, { mode: 'study', at: 9, correct: 3, total: 3, responses: { 1: ['A'], 2: ['B'], 3: ['A', 'C'] } });
+});
+test('makeAttempt copies responses (later mutation does not leak)', () => {
+  const r = { 1: ['A'] };
+  const a = makeAttempt('study', qs3, r, 1);
+  r[1].push('B');
+  assert.deepEqual(a.responses[1], ['A']);
+});
+test('wrongOf uses the current answer key; blanks are wrong; order follows questions', () => {
+  const a = { mode: 'exam', responses: { 3: ['A', 'C'], 1: ['B'] } };
+  assert.deepEqual(wrongOf(a, qs3), [1, 2]);
+  const fixed = qs3.map((q) => (q.n === 1 ? { ...q, answer: ['B'] } : q));
+  assert.deepEqual(wrongOf(a, fixed), [2]);
+});
+test('sanitizeHistory drops junk and keeps valid attempts in order', () => {
+  const ok1 = { mode: 'study', at: 1, correct: 2, total: 3, responses: {} };
+  const ok2 = { mode: 'exam', at: 2, correct: 1, total: 3, score10: 3.33, responses: { 1: ['A'] } };
+  const raw = { v: 1, attempts: [ok1, null, 'x', { mode: 'quiz', at: 1, correct: 0, total: 1, responses: {} },
+    { mode: 'exam', at: 3, correct: 1, total: 3, responses: {} } /* exam without score10 */,
+    { mode: 'study', at: 4, correct: 5, total: 3, responses: {} } /* correct > total */, ok2] };
+  assert.deepEqual(sanitizeHistory(raw), { v: 1, attempts: [ok1, ok2] });
+  for (const junk of [null, 'x', [], { attempts: 'no' }]) assert.deepEqual(sanitizeHistory(junk), { v: 1, attempts: [] });
+});
+test('appendAttempt returns the new 1-based k and loadHistory reads it back', () => {
+  withLocalStorage({ value: fakeStorage() }, () => {
+    const a = makeAttempt('study', qs3, {}, 1);
+    assert.equal(appendAttempt('E', a), 1);
+    assert.equal(appendAttempt('E', a), 2);
+    assert.equal(loadHistory('E').attempts.length, 2);
+    assert.deepEqual(loadHistory('missing'), { v: 1, attempts: [] });
+  });
+});
+test('historyStats counts modes and takes the best exam score', () => {
+  const h = { v: 1, attempts: [
+    { mode: 'exam', score10: 7 }, { mode: 'study' }, { mode: 'exam', score10: 8.5 }, { mode: 'study' }, { mode: 'study' }] };
+  assert.deepEqual(historyStats(h), { exams: 2, studies: 3, best: 8.5 });
+  assert.deepEqual(historyStats({ v: 1, attempts: [] }), { exams: 0, studies: 0, best: null });
+});
+test('formatDate is dd/mm/yyyy', () => {
+  assert.equal(formatDate(new Date(2026, 10, 2).getTime()), '02/11/2026');
 });
