@@ -5,8 +5,13 @@ Exits 1 if any error is found; prints ``<file>: <error>`` lines.
 """
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+from reconcile import reconcile  # noqa: E402
 
 REQUIRED_KEYS = ("id", "subject", "term", "code", "title", "questions")
 OPTION_LETTERS = "ABCDEF"
@@ -21,7 +26,7 @@ def _is_letter_list(value):
     return isinstance(value, list) and all(isinstance(x, str) for x in value)
 
 
-def _validate_question(q, idx, draft):
+def _validate_question(q, idx, draft, check_reconcile=True):
     """Return errors for one question. ``idx`` is its 1-based position."""
     errors = []
     label = f"questions[{idx}]"
@@ -80,11 +85,55 @@ def _validate_question(q, idx, draft):
             errors.append(f"{label}.commentAnswer: must be null when status is 'ai-only'")
         if status != "ai-only" and comment is None:
             errors.append(f"{label}.commentAnswer: must not be null when status is '{status}'")
+
+    if check_reconcile:
+        errors.extend(
+            _check_reconcile(q, label, options if valid_options else None, pick if pick_ok else None)
+        )
     return errors
 
 
-def validate_exam(data, image_count=None, draft=False):
-    """Return a list of error strings for one exam dict (empty list = OK)."""
+def _votes_ok(votes):
+    return votes is None or (
+        isinstance(votes, dict)
+        and all(isinstance(v, int) and not isinstance(v, bool) and v >= 0 for v in votes.values())
+    )
+
+
+def _check_reconcile(q, label, options, pick):
+    """Recompute status/commentAnswer from aiAnswer + commentVotes and compare."""
+    errors = []
+    ai = q.get("aiAnswer")
+    answer = q.get("answer")
+    if _is_letter_list(ai) and _is_letter_list(answer) and ai and answer and sorted(answer) != sorted(ai):
+        errors.append(f"{label}.answer: {answer} must equal aiAnswer {ai}")
+    votes = q.get("commentVotes")
+    if not _votes_ok(votes):
+        errors.append(f"{label}.commentVotes: must be null or an object of integer counts, got {votes!r}")
+        return errors
+    if options is None or pick is None or not _is_letter_list(ai) or not ai:
+        return errors
+    status, comment = reconcile(ai, votes, list(options), pick)
+    if q.get("status") in VALID_STATUSES and q.get("status") != status:
+        errors.append(
+            f"{label}.status: stored {q.get('status')!r} but aiAnswer and commentVotes give {status!r}"
+        )
+    stored_comment = q.get("commentAnswer")
+    if (comment is None) != (stored_comment is None) or (
+        comment is not None and _is_letter_list(stored_comment) and sorted(stored_comment) != sorted(comment)
+    ):
+        errors.append(
+            f"{label}.commentAnswer: stored {stored_comment!r} but commentVotes give {comment!r}"
+        )
+    return errors
+
+
+def validate_exam(data, image_count=None, draft=False, check_reconcile=True):
+    """Return a list of error strings for one exam dict (empty list = OK).
+
+    ``check_reconcile=False`` skips the status/commentAnswer/answer consistency checks
+    (merge_comments uses it: it is about to recompute them).
+    """
     if not isinstance(data, dict):
         return ["exam: must be a JSON object"]
     errors = []
@@ -107,7 +156,7 @@ def validate_exam(data, image_count=None, draft=False):
                 n = q.get("n") if isinstance(q, dict) else None
                 if isinstance(n, bool) or not isinstance(n, int) or n != pos:
                     errors.append(f"questions[{pos}].n: expected {pos}, got {n!r}")
-                errors.extend(_validate_question(q, pos, draft))
+                errors.extend(_validate_question(q, pos, draft, check_reconcile))
             if image_count is not None and image_count != len(questions):
                 errors.append(
                     f"questions: image count {image_count} != {len(questions)} questions"

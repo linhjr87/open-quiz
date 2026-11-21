@@ -141,6 +141,54 @@ class ValidateExamTests(unittest.TestCase):
         self.assert_error(validate.validate_exam(data), "n")
 
 
+class ValidateReconcileTests(unittest.TestCase):
+    def assert_error(self, errors, field):
+        self.assertTrue(any(field in e for e in errors), f"no error mentions {field!r}: {errors}")
+
+    def test_stored_status_must_match_recomputed(self):
+        data = load_sample()
+        data["questions"][0]["status"] = "disputed"  # votes {"B": 2} agree with the AI
+        self.assert_error(validate.validate_exam(data), "status")
+
+    def test_stored_comment_answer_must_match_recomputed(self):
+        data = load_sample()
+        data["questions"][1]["commentAnswer"] = ["D"]  # votes say C
+        self.assert_error(validate.validate_exam(data), "commentAnswer")
+
+    def test_votes_removed_but_status_kept(self):
+        data = load_sample()
+        data["questions"][0]["commentVotes"] = None
+        self.assert_error(validate.validate_exam(data), "status")
+
+    def test_answer_must_equal_ai_answer(self):
+        data = load_sample()
+        data["questions"][0]["answer"] = ["C"]
+        self.assert_error(validate.validate_exam(data), "answer")
+
+    def test_tied_votes_with_ai_key_is_verified(self):
+        data = load_sample()
+        q = data["questions"][0]
+        q["commentVotes"] = {"A": 1, "B": 1}
+        self.assertEqual(validate.validate_exam(data), [])
+
+    def test_draft_skips_reconcile(self):
+        data = load_sample()
+        data["questions"][0]["status"] = "disputed"
+        data["questions"][0]["answer"] = ["C"]
+        errors = validate.validate_exam(data, draft=True)
+        self.assertFalse(any("status" in e or "answer" in e for e in errors), errors)
+
+    def test_check_reconcile_can_be_disabled(self):
+        data = load_sample()
+        data["questions"][0]["status"] = "disputed"
+        self.assertEqual(validate.validate_exam(data, check_reconcile=False), [])
+
+    def test_malformed_votes_are_an_error_not_a_crash(self):
+        data = load_sample()
+        data["questions"][0]["commentVotes"] = ["B"]
+        self.assert_error(validate.validate_exam(data), "commentVotes")
+
+
 class ValidateManifestTests(unittest.TestCase):
     def make(self):
         exam = load_sample()

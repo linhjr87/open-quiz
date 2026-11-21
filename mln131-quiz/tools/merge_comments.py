@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from build_manifest import DEFAULT_DATA_DIR, write_manifest  # noqa: E402
+from reconcile import _filter_votes, reconcile  # noqa: E402,F401
 from validate import validate_exam  # noqa: E402
 
 BASE_URL = "https://fuexam.me"
@@ -29,29 +30,6 @@ def parse_dist(s):
         key, _, count = part.partition(":")
         dist[key.strip()] = int(count)
     return dist
-
-
-def _filter_votes(votes, options, pick):
-    """Keep only vote keys with ``pick`` letters, all of them in ``options``."""
-    if not votes:
-        return {}
-    allowed = set(options)
-    return {
-        k: v for k, v in votes.items() if len(k) == pick and k and set(k) <= allowed
-    }
-
-
-def reconcile(ai, votes, options, pick):
-    """Return ``(status, commentAnswer)`` from the AI answer and the vote distribution."""
-    votes = _filter_votes(votes, options, pick)
-    if not votes:
-        return "ai-only", None
-    aikey = "".join(sorted(ai))
-    best = max(votes.values())
-    top = [k for k, v in votes.items() if v == best]
-    if aikey in top:
-        return "verified", list(aikey)
-    return "disputed", list(sorted(top)[0])
 
 
 def merge(exam, dist_by_n, source):
@@ -146,7 +124,7 @@ def main(argv=None):
             exam = json.load(f)
         if args.only and exam["id"] != args.only:
             continue
-        if validate_exam(exam, draft=False):
+        if validate_exam(exam, draft=False, check_reconcile=False):
             print(f"{exam.get('id', path.stem)}: skipped, not fully answered")
             continue
         dist_by_n = rows.get(f"{exam['term']}/{exam['code']}")
