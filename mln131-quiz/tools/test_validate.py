@@ -98,6 +98,49 @@ class ValidateExamTests(unittest.TestCase):
         self.assert_error(validate.validate_exam(data), "text")
 
 
+    def test_duplicate_answer_letters(self):
+        data = load_sample()
+        q = data["questions"][0]
+        q["pick"] = 2
+        q["answer"] = ["B", "B"]
+        q["aiAnswer"] = ["A", "B"]
+        q["commentAnswer"] = ["A", "B"]
+        errors = validate.validate_exam(data)
+        self.assertTrue(any("answer" in e and "unique" in e for e in errors), errors)
+
+    def test_duplicate_ai_answer_letters(self):
+        data = load_sample()
+        q = data["questions"][0]
+        q["pick"] = 2
+        q["answer"] = ["A", "B"]
+        q["aiAnswer"] = ["B", "B"]
+        errors = validate.validate_exam(data)
+        self.assertTrue(any("aiAnswer" in e and "unique" in e for e in errors), errors)
+
+    def test_ai_answer_length_must_equal_pick(self):
+        data = load_sample()
+        q = data["questions"][0]
+        q["aiAnswer"] = ["A", "B"]
+        errors = validate.validate_exam(data)
+        self.assertTrue(any("aiAnswer" in e and "pick" in e for e in errors), errors)
+
+    def test_draft_ignores_answer_uniqueness(self):
+        data = load_sample()
+        data["questions"][0]["answer"] = ["B", "B"]
+        self.assertEqual(validate.validate_exam(data, draft=True), [])
+
+    def test_n_must_not_be_bool(self):
+        data = load_sample()
+        data["questions"][0]["n"] = True
+        self.assert_error(validate.validate_exam(data), "n")
+        self.assert_error(validate.validate_exam(data, draft=True), "n")
+
+    def test_n_must_not_be_float(self):
+        data = load_sample()
+        data["questions"][0]["n"] = 1.0
+        self.assert_error(validate.validate_exam(data), "n")
+
+
 class ValidateManifestTests(unittest.TestCase):
     def make(self):
         exam = load_sample()

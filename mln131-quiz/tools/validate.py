@@ -62,9 +62,14 @@ def _validate_question(q, idx, draft):
             missing = [x for x in value if x not in options]
             if missing:
                 errors.append(f"{label}.{field}: {missing} not in options {sorted(options)}")
+        if _is_letter_list(value) and len(set(value)) != len(value):
+            errors.append(f"{label}.{field}: letters must be unique, got {value}")
     answer = q.get("answer")
     if pick_ok and _is_letter_list(answer) and answer and len(answer) != pick:
         errors.append(f"{label}.pick: pick={pick} but answer has {len(answer)} letters")
+    ai_answer = q.get("aiAnswer")
+    if pick_ok and _is_letter_list(ai_answer) and ai_answer and len(ai_answer) != pick:
+        errors.append(f"{label}.pick: pick={pick} but aiAnswer has {len(ai_answer)} letters")
 
     status = q.get("status")
     if status not in VALID_STATUSES:
@@ -100,7 +105,7 @@ def validate_exam(data, image_count=None, draft=False):
         else:
             for pos, q in enumerate(questions, start=1):
                 n = q.get("n") if isinstance(q, dict) else None
-                if n != pos:
+                if isinstance(n, bool) or not isinstance(n, int) or n != pos:
                     errors.append(f"questions[{pos}].n: expected {pos}, got {n!r}")
                 errors.extend(_validate_question(q, pos, draft))
             if image_count is not None and image_count != len(questions):
