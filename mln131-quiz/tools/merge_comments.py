@@ -12,6 +12,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from build_manifest import DEFAULT_DATA_DIR, write_manifest  # noqa: E402
+from validate import validate_exam  # noqa: E402
 
 BASE_URL = "https://fuexam.me"
 
@@ -67,16 +68,48 @@ def merge(exam, dist_by_n, source):
     return exam
 
 
+def _warn(de, cau, reason):
+    print(f"warn: {de}/{cau}: {reason}", file=sys.stderr)
+
+
+def _row_dist(row):
+    """Votes for one CSV row.
+
+    A row without ``phan_bo`` but with ``dap_an`` is hand-mapped (e.g. "SUA TAY"):
+    its votes are ``{dap_an: max(phieu, 1)}``. Raises ValueError on a malformed row.
+    """
+    phan_bo = row.get("phan_bo") or ""
+    dap_an = (row.get("dap_an") or "").strip()
+    if phan_bo.strip() or not dap_an:
+        return parse_dist(phan_bo)
+    return {dap_an: max(int((row.get("phieu") or "").strip() or 0), 1)}
+
+
 def load_csv(path):
-    """Return ``{"<TERM>/<CODE>": {n: {key: count}}}`` from answers_all.csv."""
+    """Return ``{"<TERM>/<CODE>": {n: {key: count}}}`` from answers_all.csv.
+
+    Malformed rows (missing ``de``/``cau``, unparsable ``phan_bo``/``phieu``) are
+    skipped with one ``warn: <de>/<cau>: <reason>`` line on stderr.
+    """
     rows = {}
     with open(path, encoding="utf-8-sig", newline="") as f:
         for row in csv.DictReader(f):
-            try:
-                n = int(row["cau"])
-            except (KeyError, TypeError, ValueError):
+            de = (row.get("de") or "").strip()
+            raw_cau = (row.get("cau") or "").strip()
+            if not de:
+                _warn(de, raw_cau, "missing de")
                 continue
-            rows.setdefault(row["de"].strip(), {})[n] = parse_dist(row.get("phan_bo") or "")
+            try:
+                n = int(raw_cau)
+            except ValueError:
+                _warn(de, raw_cau, f"missing or invalid cau {raw_cau!r}")
+                continue
+            try:
+                dist = _row_dist(row)
+            except ValueError as exc:
+                _warn(de, n, f"malformed votes ({exc})")
+                continue
+            rows.setdefault(de, {})[n] = dist
     return rows
 
 
@@ -112,6 +145,9 @@ def main(argv=None):
         with open(path, encoding="utf-8") as f:
             exam = json.load(f)
         if args.only and exam["id"] != args.only:
+            continue
+        if validate_exam(exam, draft=False):
+            print(f"{exam.get('id', path.stem)}: skipped, not fully answered")
             continue
         dist_by_n = rows.get(f"{exam['term']}/{exam['code']}")
         if not dist_by_n:

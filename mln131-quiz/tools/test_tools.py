@@ -186,13 +186,66 @@ class LoadCsvTests(unittest.TestCase):
             path.write_text(
                 CSV_HEADER
                 + 'FA24/FE,1,A,4,4,3,"A:3, D:1",x\n'
-                + "FA24/FE,2,B,0,0,0,,x\n"
+                + "FA24/FE,2,,0,0,0,,x\n"
                 + "SP25/FE,1,C,1,1,1,C:1,x\n",
                 encoding="utf-8-sig",
             )
             rows = merge_comments.load_csv(path)
         self.assertEqual(rows["FA24/FE"], {1: {"A": 3, "D": 1}, 2: {}})
         self.assertEqual(rows["SP25/FE"], {1: {"C": 1}})
+
+    def test_hand_mapped_row_uses_dap_an(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "answers_all.csv"
+            path.write_text(
+                CSV_HEADER
+                + "FA24/B5-FE,17,B,0,0,0.0,,SUA TAY\n"
+                + "FA24/B5-FE,43,D,,,,   ,SUA TAY\n"
+                + "FA24/B5-FE,56,C,3,3,1.0,,SUA TAY\n"
+                + "FA24/B5-FE,57,,0,0,0.0,,\n",
+                encoding="utf-8-sig",
+            )
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                rows = merge_comments.load_csv(path)
+        self.assertEqual(
+            rows["FA24/B5-FE"], {17: {"B": 1}, 43: {"D": 1}, 56: {"C": 3}, 57: {}}
+        )
+        self.assertEqual(err.getvalue(), "")
+
+    def test_hand_mapped_votes_merge(self):
+        exam = make_exam("FA24", "FE", ("ai-only", "ai-only", "ai-only"))
+        merged = merge_comments.merge(exam, {1: {"A": 1}, 2: {"C": 1}}, None)
+        self.assertEqual(
+            [q["status"] for q in merged["questions"]], ["verified", "disputed", "ai-only"]
+        )
+
+    def test_malformed_rows_skipped(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "answers_all.csv"
+            path.write_text(
+                CSV_HEADER
+                + 'FA24/FE,1,A,4,4,3,"A:3, D:1",x\n'
+                + "FA24/FE,2,A,2,2,2,A:x,x\n"
+                + "FA24/FE,3,A,2,2,2,A,x\n"
+                + "FA24/FE,4,B,1,1,1,B:1,x\n"
+                + ",5,A,1,1,1,A:1,x\n"
+                + "FA24/FE,,A,1,1,1,A:1,x\n"
+                + "FA24/FE,zz,A,1,1,1,A:1,x\n"
+                + "FA24/FE,6,B,oops,0,0,,SUA TAY\n",
+                encoding="utf-8-sig",
+            )
+            err = io.StringIO()
+            with contextlib.redirect_stderr(err):
+                rows = merge_comments.load_csv(path)
+        self.assertEqual(rows, {"FA24/FE": {1: {"A": 3, "D": 1}, 4: {"B": 1}}})
+        lines = err.getvalue().splitlines()
+        self.assertEqual(len(lines), 6)
+        for line, prefix in zip(
+            lines,
+            ["FA24/FE/2", "FA24/FE/3", "/5", "FA24/FE/", "FA24/FE/zz", "FA24/FE/6"],
+        ):
+            self.assertTrue(line.startswith(f"warn: {prefix}: "), line)
 
 
 class MergeCliTests(unittest.TestCase):
@@ -211,7 +264,7 @@ class MergeCliTests(unittest.TestCase):
             CSV_HEADER
             + 'FA24/FE,1,A,4,4,3,"A:3, D:1",x\n'
             + "FA24/FE,2,A,2,2,2,B:2,x\n"
-            + "FA24/FE,3,A,0,0,0,,x\n"
+            + "FA24/FE,3,,0,0,0,,x\n"
             + "SU25/FE,1,A,1,1,1,A:1,x\n",
             encoding="utf-8-sig",
         )
@@ -258,6 +311,21 @@ class MergeCliTests(unittest.TestCase):
         self.assertIn("FA24-FE:", out)
         self.assertNotIn("SU25-FE", out)
         self.assertEqual((self.data / "SU25-FE.json").read_bytes(), before)
+
+    def test_cli_skips_unanswered_exam(self):
+        draft = make_exam("SP26", "FE")
+        for q in draft["questions"]:
+            for key in ("answer", "aiAnswer", "commentAnswer", "commentVotes", "status"):
+                q.pop(key)
+        write_json(self.data / "SP26-FE.json", draft)
+        with open(self.csv, "a", encoding="utf-8") as f:
+            f.write("SP26/FE,1,A,1,1,1,A:1,x\n")
+        before = (self.data / "SP26-FE.json").read_bytes()
+        code, out = self.run_cli()
+        self.assertEqual(code, 0)
+        self.assertIn("SP26-FE: skipped, not fully answered", out)
+        self.assertEqual((self.data / "SP26-FE.json").read_bytes(), before)
+        self.assertIn("FA24-FE: verified 1, disputed 1, ai-only 1", out)
 
 
 if __name__ == "__main__":
