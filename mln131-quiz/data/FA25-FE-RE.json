@@ -243,10 +243,10 @@
       },
       "pick": 1,
       "answer": [
-        "C"
+        "B"
       ],
       "aiAnswer": [
-        "C"
+        "B"
       ],
       "commentAnswer": [
         "C"
@@ -254,8 +254,8 @@
       "commentVotes": {
         "C": 6
       },
-      "status": "verified",
-      "ocrNote": "Source text reads 'Kiên toàn' (likely exam typo for 'Kiện toàn'); kept verbatim. | pass2: \"Kiên toàn\" -> \"Kiện toàn\" (zoomed image clearly shows the dot below ê)"
+      "status": "disputed",
+      "ocrNote": "Source text reads 'Kiên toàn' (likely exam typo for 'Kiện toàn'); kept verbatim. | pass2: \"Kiên toàn\" -> \"Kiện toàn\" (zoomed image clearly shows the dot below ê) | review: harmonized across duplicates (Party/Hiến pháp wording 'cơ quan quyền lực nhà nước cao nhất'; controller ruling)"
     },
     {
       "n": 11,

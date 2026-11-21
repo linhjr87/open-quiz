@@ -43,8 +43,8 @@
       "code": "B5-FE",
       "count": 60,
       "stats": {
-        "verified": 60,
-        "disputed": 0,
+        "verified": 59,
+        "disputed": 1,
         "aiOnly": 0
       }
     },
@@ -79,8 +79,8 @@
       "code": "FE-RE",
       "count": 60,
       "stats": {
-        "verified": 59,
-        "disputed": 1,
+        "verified": 58,
+        "disputed": 2,
         "aiOnly": 0
       }
     },
@@ -103,8 +103,8 @@
       "code": "B5-FE-RE",
       "count": 60,
       "stats": {
-        "verified": 60,
-        "disputed": 0,
+        "verified": 59,
+        "disputed": 1,
         "aiOnly": 0
       }
     },

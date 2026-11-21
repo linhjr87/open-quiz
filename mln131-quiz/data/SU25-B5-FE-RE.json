@@ -517,10 +517,10 @@
       },
       "pick": 1,
       "answer": [
-        "A"
+        "B"
       ],
       "aiAnswer": [
-        "A"
+        "B"
       ],
       "commentAnswer": [
         "A"
@@ -528,8 +528,8 @@
       "commentVotes": {
         "A": 3
       },
-      "status": "verified",
-      "ocrNote": null
+      "status": "disputed",
+      "ocrNote": "review: harmonized across duplicates (Giáo trình CNXHKH ch.7 'gia đình có vai trò quyết định đối với sự tồn tại, vận động và phát triển của xã hội'; question sits in the family-chapter block)"
     },
     {
       "n": 22,
