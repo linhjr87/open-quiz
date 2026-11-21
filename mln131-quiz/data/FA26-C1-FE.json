@@ -1006,10 +1006,10 @@
       },
       "pick": 1,
       "answer": [
-        "A"
+        "D"
       ],
       "aiAnswer": [
-        "A"
+        "D"
       ],
       "commentAnswer": [
         "D"
@@ -1018,8 +1018,8 @@
         "D": 5,
         "A": 3
       },
-      "status": "disputed",
-      "ocrNote": null
+      "status": "verified",
+      "ocrNote": "review: changed AI A->D (option D (căn cứ nhận thức khoa học để cảnh giác, đấu tranh chống nhận thức sai lệch) is the lý luận meaning in the Giáo trình (recalled from memory); A, B, C are the thực tiễn points; AI answers D on the 5 other copies)"
     },
     {
       "n": 41,

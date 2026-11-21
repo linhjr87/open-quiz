@@ -292,10 +292,10 @@
       },
       "pick": 1,
       "answer": [
-        "A"
+        "D"
       ],
       "aiAnswer": [
-        "A"
+        "D"
       ],
       "commentAnswer": [
         "D"
@@ -305,8 +305,8 @@
         "A": 2,
         "B": 1
       },
-      "status": "disputed",
-      "ocrNote": null
+      "status": "verified",
+      "ocrNote": "review: changed AI A->D (same question as SU25-FE 9 and SU26-FE 16 where AI answers D; 'giá trị nhân loại chung' is a generic definition of democracy, not a direction set by Hồ Chí Minh, who tied democracy to the people's freedom/happiness and to socialism)"
     },
     {
       "n": 13,
@@ -632,7 +632,7 @@
         "A": 3
       },
       "status": "disputed",
-      "ocrNote": null
+      "ocrNote": "review: kept AI (Công xã Pari (1871) is the standard 'first proletarian revolution'; Tháng Mười Nga is the first victorious one; contestable; AI and comments agree on A in SU24-FE 28, SU24-B5-FE 28)"
     },
     {
       "n": 26,
@@ -995,10 +995,10 @@
       },
       "pick": 1,
       "answer": [
-        "C"
+        "B"
       ],
       "aiAnswer": [
-        "C"
+        "B"
       ],
       "commentAnswer": [
         "B"
@@ -1006,8 +1006,8 @@
       "commentVotes": {
         "B": 3
       },
-      "status": "disputed",
-      "ocrNote": null
+      "status": "verified",
+      "ocrNote": "review: changed AI C->B (the 'phân công, phối hợp, kiểm soát' formula first appears in the Cương lĩnh 2011 adopted at Đại hội XI (Đại hội X had only phân công, phối hợp); AI answers B on the 4 other copies)"
     },
     {
       "n": 41,

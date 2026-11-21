@@ -29,7 +29,7 @@
         "C": 8
       },
       "status": "disputed",
-      "ocrNote": null
+      "ocrNote": "review: kept AI (Công xã Pari (1871) is the standard 'first proletarian revolution'; Tháng Mười Nga is the first victorious one; contestable; AI and comments agree on A in SU24-FE 28, SU24-B5-FE 28)"
     },
     {
       "n": 2,
@@ -167,10 +167,10 @@
       },
       "pick": 1,
       "answer": [
-        "C"
+        "D"
       ],
       "aiAnswer": [
-        "C"
+        "D"
       ],
       "commentAnswer": [
         "D"
@@ -178,8 +178,8 @@
       "commentVotes": {
         "D": 7
       },
-      "status": "disputed",
-      "ocrNote": null
+      "status": "verified",
+      "ocrNote": "review: changed AI C->D (Lênin's assessment 'tác phẩm chủ yếu và cơ bản ấy trình bày CNXHKH…' refers to bộ Tư bản; AI answers D on SU25-FE 28)"
     },
     {
       "n": 8,
@@ -555,7 +555,7 @@
         "C": 6
       },
       "status": "disputed",
-      "ocrNote": null
+      "ocrNote": "review: kept AI (B matches 'cơ quan quyền lực nhà nước cao nhất' (Hiến pháp); C is the textbook-style paraphrase; contestable)"
     },
     {
       "n": 23,
@@ -1155,7 +1155,7 @@
         "A": 6
       },
       "status": "disputed",
-      "ocrNote": null
+      "ocrNote": "review: kept AI (Giáo trình CNXHKH ch.7, recalled from memory and not checked against a copy: 'Gia đình có vai trò quyết định đối với sự tồn tại, vận động và phát triển của xã hội'; contestable, comments favour 'Con người')"
     },
     {
       "n": 47,

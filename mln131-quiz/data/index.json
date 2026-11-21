@@ -7,8 +7,8 @@
       "code": "C1-FE",
       "count": 60,
       "stats": {
-        "verified": 59,
-        "disputed": 1,
+        "verified": 60,
+        "disputed": 0,
         "aiOnly": 0
       }
     },
@@ -43,8 +43,8 @@
       "code": "B5-FE",
       "count": 60,
       "stats": {
-        "verified": 59,
-        "disputed": 1,
+        "verified": 60,
+        "disputed": 0,
         "aiOnly": 0
       }
     },
@@ -67,8 +67,8 @@
       "code": "FE-RE",
       "count": 60,
       "stats": {
-        "verified": 56,
-        "disputed": 4,
+        "verified": 57,
+        "disputed": 3,
         "aiOnly": 0
       }
     },
@@ -79,8 +79,8 @@
       "code": "FE-RE",
       "count": 60,
       "stats": {
-        "verified": 57,
-        "disputed": 3,
+        "verified": 59,
+        "disputed": 1,
         "aiOnly": 0
       }
     },
@@ -103,8 +103,8 @@
       "code": "B5-FE-RE",
       "count": 60,
       "stats": {
-        "verified": 59,
-        "disputed": 1,
+        "verified": 60,
+        "disputed": 0,
         "aiOnly": 0
       }
     },
@@ -127,8 +127,8 @@
       "code": "B5-FE",
       "count": 60,
       "stats": {
-        "verified": 57,
-        "disputed": 3,
+        "verified": 59,
+        "disputed": 1,
         "aiOnly": 0
       }
     },
@@ -211,8 +211,8 @@
       "code": "FE",
       "count": 60,
       "stats": {
-        "verified": 59,
-        "disputed": 1,
+        "verified": 60,
+        "disputed": 0,
         "aiOnly": 0
       }
     },

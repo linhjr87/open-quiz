@@ -695,10 +695,10 @@
       },
       "pick": 1,
       "answer": [
-        "D"
+        "A"
       ],
       "aiAnswer": [
-        "D"
+        "A"
       ],
       "commentAnswer": [
         "A"
@@ -706,12 +706,12 @@
       "commentVotes": {
         "A": 8
       },
-      "status": "disputed",
-      "ocrNote": null
+      "status": "verified",
+      "ocrNote": "review: changed AI D->A (this variant (option A 'Ưu tiên đầu tư phát triển kinh tế - xã hội các vùng dân tộc và miền núi') is answered A by AI on FA26-C2-FE 55 and SU25-B5-FE-RE 6; aligned to that)"
     },
     {
       "n": 29,
-      "text": "Ở Việt Nam hiện nay, tổ chức nào đại diện cho quyền lợi, lợi ích hợp pháp và là nơi để giai cấp công nhân chủ động, tích cực tham gia xây dựng, chinh đốn Đảng, bảo vệ chế độ xã hội chủ nghĩa, bảo vệ nhân dân?",
+      "text": "Ở Việt Nam hiện nay, tổ chức nào đại diện cho quyền lợi, lợi ích hợp pháp và là nơi để giai cấp công nhân chủ động, tích cực tham gia xây dựng, chỉnh đốn Đảng, bảo vệ chế độ xã hội chủ nghĩa, bảo vệ nhân dân?",
       "options": {
         "A": "Hệ thống tổ chức Công đoàn",
         "B": "Quốc hội",
@@ -732,7 +732,7 @@
         "A": 7
       },
       "status": "verified",
-      "ocrNote": "pass2: text 'chỉnh đốn' -> 'chinh đốn' (exam typo as shown)"
+      "ocrNote": "pass2: text 'chỉnh đốn' -> 'chinh đốn' (exam typo as shown) | review: ocr fix 'chinh đốn' -> 'chỉnh đốn' (pixel map: mark above the i is 5x5 px with a dark core, same shape as the hỏi hook in 'bảo'; the plain i dot in 'gia' is 3x3 px)"
     },
     {
       "n": 30,

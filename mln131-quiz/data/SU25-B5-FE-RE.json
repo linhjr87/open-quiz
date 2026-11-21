@@ -1340,10 +1340,10 @@
       },
       "pick": 1,
       "answer": [
-        "D"
+        "C"
       ],
       "aiAnswer": [
-        "D"
+        "C"
       ],
       "commentAnswer": [
         "C"
@@ -1351,8 +1351,8 @@
       "commentVotes": {
         "C": 3
       },
-      "status": "disputed",
-      "ocrNote": null
+      "status": "verified",
+      "ocrNote": "review: changed AI D->C (C is the Đại hội XIII wording (… công bằng xã hội, bảo vệ môi trường); distractors A, B, D are all edits of C; AI answers C on the 4 other copies)"
     },
     {
       "n": 54,

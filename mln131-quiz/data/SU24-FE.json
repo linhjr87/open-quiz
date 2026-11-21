@@ -945,10 +945,10 @@
       },
       "pick": 1,
       "answer": [
-        "D"
+        "A"
       ],
       "aiAnswer": [
-        "D"
+        "A"
       ],
       "commentAnswer": [
         "A"
@@ -956,8 +956,8 @@
       "commentVotes": {
         "A": 2
       },
-      "status": "disputed",
-      "ocrNote": null
+      "status": "verified",
+      "ocrNote": "review: changed AI D->A (quote is from Ph.Ăngghen, Nguồn gốc của gia đình, của chế độ tư hữu và của nhà nước; AI already answers A on FA26-C2-FE 32 and SU24-FE-RE 37)"
     },
     {
       "n": 39,
