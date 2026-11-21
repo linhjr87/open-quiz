@@ -4,7 +4,7 @@
   "term": "SU25",
   "code": "FE",
   "title": "MLN131 · SU25 · FE",
-  "source": null,
+  "source": "https://fuexam.me/threads/mln131-su25-fe.1049/",
   "questions": [
     {
       "n": 1,
@@ -22,9 +22,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 5
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -43,9 +47,13 @@
       "aiAnswer": [
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "B"
+      ],
+      "commentVotes": {
+        "B": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -64,9 +72,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -85,9 +97,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -106,9 +122,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -127,9 +147,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -148,9 +172,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -169,9 +197,15 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4,
+        "D": 3,
+        "B": 1
+      },
+      "status": "disputed",
       "ocrNote": null
     },
     {
@@ -190,9 +224,14 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 3,
+        "D": 2
+      },
+      "status": "disputed",
       "ocrNote": null
     },
     {
@@ -211,9 +250,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -232,9 +275,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 6
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -253,9 +300,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 5
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -274,9 +325,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -295,9 +350,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -316,9 +375,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 5
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -337,9 +400,13 @@
       "aiAnswer": [
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "B"
+      ],
+      "commentVotes": {
+        "B": 5
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -358,9 +425,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 5
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -379,9 +450,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 5
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -400,9 +475,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 5
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -421,9 +500,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -442,9 +525,14 @@
       "aiAnswer": [
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4,
+        "B": 2
+      },
+      "status": "disputed",
       "ocrNote": null
     },
     {
@@ -463,9 +551,13 @@
       "aiAnswer": [
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "B"
+      ],
+      "commentVotes": {
+        "B": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -484,9 +576,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -505,9 +601,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -526,9 +626,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -547,9 +651,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -568,9 +676,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -589,9 +701,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -610,9 +726,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -631,9 +751,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 5
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -652,9 +776,13 @@
       "aiAnswer": [
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "B"
+      ],
+      "commentVotes": {
+        "B": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -673,9 +801,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -694,9 +826,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -715,9 +851,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -736,9 +876,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -757,9 +901,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -778,9 +926,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -799,9 +951,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -820,9 +976,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -843,9 +1003,14 @@
         "A",
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A",
+        "B"
+      ],
+      "commentVotes": {
+        "AB": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -866,9 +1031,14 @@
         "A",
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A",
+        "B"
+      ],
+      "commentVotes": {
+        "AB": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -887,9 +1057,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -912,9 +1086,15 @@
         "B",
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A",
+        "B",
+        "C"
+      ],
+      "commentVotes": {
+        "ABC": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -933,9 +1113,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -954,9 +1138,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -975,9 +1163,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -996,9 +1188,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1017,9 +1213,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1038,9 +1238,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1059,9 +1263,13 @@
       "aiAnswer": [
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "B"
+      ],
+      "commentVotes": {
+        "B": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1080,9 +1288,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1101,9 +1313,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1122,9 +1338,13 @@
       "aiAnswer": [
         "D"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "D"
+      ],
+      "commentVotes": {
+        "D": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1143,9 +1363,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1164,9 +1388,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1185,9 +1413,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1206,9 +1438,13 @@
       "aiAnswer": [
         "B"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "B"
+      ],
+      "commentVotes": {
+        "B": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1227,9 +1463,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 3
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1248,9 +1488,13 @@
       "aiAnswer": [
         "A"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "A"
+      ],
+      "commentVotes": {
+        "A": 4
+      },
+      "status": "verified",
       "ocrNote": null
     },
     {
@@ -1269,9 +1513,13 @@
       "aiAnswer": [
         "C"
       ],
-      "commentAnswer": null,
-      "commentVotes": null,
-      "status": "ai-only",
+      "commentAnswer": [
+        "C"
+      ],
+      "commentVotes": {
+        "C": 2
+      },
+      "status": "verified",
       "ocrNote": null
     }
   ]

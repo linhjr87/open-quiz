@@ -1,12 +1,232 @@
 {
   "exams": [
     {
-      "id": "TEST-FE",
-      "title": "MLN131 · TEST · FE",
-      "term": "TEST",
+      "id": "FA26-C1-FE",
+      "title": "MLN131 · FA26 · C1-FE",
+      "term": "FA26",
+      "code": "C1-FE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA26-C1-FE-RE",
+      "title": "MLN131 · FA26 · C1-FE-RE",
+      "term": "FA26",
+      "code": "C1-FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA26-C2-FE",
+      "title": "MLN131 · FA26 · C2-FE",
+      "term": "FA26",
+      "code": "C2-FE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU26-B5-FE",
+      "title": "MLN131 · SU26 · B5-FE",
+      "term": "SU26",
+      "code": "B5-FE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU26-FE",
+      "title": "MLN131 · SU26 · FE",
+      "term": "SU26",
       "code": "FE",
-      "count": 3,
-      "stats": { "verified": 1, "disputed": 1, "aiOnly": 1 }
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU26-FE-RE",
+      "title": "MLN131 · SU26 · FE-RE",
+      "term": "SU26",
+      "code": "FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 56,
+        "disputed": 4,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA25-FE-RE",
+      "title": "MLN131 · FA25 · FE-RE",
+      "term": "FA25",
+      "code": "FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 57,
+        "disputed": 3,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU25-B5-FE",
+      "title": "MLN131 · SU25 · B5-FE",
+      "term": "SU25",
+      "code": "B5-FE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU25-B5-FE-RE",
+      "title": "MLN131 · SU25 · B5-FE-RE",
+      "term": "SU25",
+      "code": "B5-FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU25-FE",
+      "title": "MLN131 · SU25 · FE",
+      "term": "SU25",
+      "code": "FE",
+      "count": 60,
+      "stats": {
+        "verified": 57,
+        "disputed": 3,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SP25-B5-FE",
+      "title": "MLN131 · SP25 · B5-FE",
+      "term": "SP25",
+      "code": "B5-FE",
+      "count": 60,
+      "stats": {
+        "verified": 57,
+        "disputed": 3,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SP25-FE",
+      "title": "MLN131 · SP25 · FE",
+      "term": "SP25",
+      "code": "FE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA24-B5-FE",
+      "title": "MLN131 · FA24 · B5-FE",
+      "term": "FA24",
+      "code": "B5-FE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA24-B5-FE-RE",
+      "title": "MLN131 · FA24 · B5-FE-RE",
+      "term": "FA24",
+      "code": "B5-FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA24-FE",
+      "title": "MLN131 · FA24 · FE",
+      "term": "FA24",
+      "code": "FE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA24-FE-RE",
+      "title": "MLN131 · FA24 · FE-RE",
+      "term": "FA24",
+      "code": "FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU24-B5-FE",
+      "title": "MLN131 · SU24 · B5-FE",
+      "term": "SU24",
+      "code": "B5-FE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU24-FE",
+      "title": "MLN131 · SU24 · FE",
+      "term": "SU24",
+      "code": "FE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU24-FE-RE",
+      "title": "MLN131 · SU24 · FE-RE",
+      "term": "SU24",
+      "code": "FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
     }
   ]
 }
