@@ -1,0 +1,752 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MLN131 Phòng thi thử</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one reading column (max 760px) under a sticky bar; quiz views add a left question-list sidebar (max 1120px, collapses on narrow screens). Theme: Đông Sơn bronze drum — patina green for interaction, bronze for ornament (drum face in the hero, ring "ladder" band under the bar), rice-paper ground, lacquer red rule on each question (also a nod to the red rule of FPT's EOS exam client) */
+:root{
+  --bg:#F4EFE4; --surface:#FFFCF6; --sunken:#ECE4D3; --line:#DCD0B8; --fg:#2B2116; --muted:#6A5A44;
+  --accent:#1F5E58; --accent-weak:#E1EEEA; --on-accent:#FBF7EE;
+  --bronze:#9A6A2E; --bronze-weak:#F1E4CC;
+  --ok:#3E6A1C; --ok-weak:#E8EFD9; --bad:#A3261C; --bad-weak:#F6E2DC; --warn:#9A5B00; --warn-weak:#F8EBCF;
+  --eos:#A3261C;
+  --font:"Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#15110C; --surface:#1E1912; --sunken:#29221A; --line:#3C3226; --fg:#F0E7D6; --muted:#B8A78B;
+  --accent:#72C3B7; --accent-weak:#16312E; --on-accent:#0D1A18;
+  --bronze:#D3A15F; --bronze-weak:#33271A;
+  --ok:#A3CF73; --ok-weak:#1D2912; --bad:#F08B7E; --bad-weak:#3A1813; --warn:#EDB24C; --warn-weak:#35270B;
+  --eos:#E0584B; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#15110C; --surface:#1E1912; --sunken:#29221A; --line:#3C3226; --fg:#F0E7D6; --muted:#B8A78B;
+  --accent:#72C3B7; --accent-weak:#16312E; --on-accent:#0D1A18;
+  --bronze:#D3A15F; --bronze-weak:#33271A;
+  --ok:#A3CF73; --ok-weak:#1D2912; --bad:#F08B7E; --bad-weak:#3A1813; --warn:#EDB24C; --warn-weak:#35270B;
+  --eos:#E0584B; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.6 var(--font);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar .wrap{display:flex;align-items:center;gap:12px;min-height:56px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.01em}
+.brand .star{width:26px;height:26px;color:var(--bronze)}
+.brand .mark{font-family:var(--mono);font-size:13px;padding:3px 7px;border-radius:6px;background:var(--bronze-weak);color:var(--bronze);border:1px solid var(--bronze)}
+.bar .spacer{flex:1}
+.iconbtn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;border:0;background:transparent}
+.iconbtn:hover{background:var(--sunken)}
+.bar-title{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.bar-title b{font-size:15px}
+.bar-title span{font-size:13px;color:var(--muted)}
+.proto{font-size:12px;color:var(--muted);text-align:center;padding-block:6px;background:var(--sunken);border-bottom:1px solid var(--line)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:15px;transition:background .15s,border-color .15s}
+.btn:hover{background:var(--sunken)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* home */
+.hero-band{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+.hero{position:relative;z-index:1;padding-block:40px 28px}
+.drum{position:absolute;top:50%;transform:translateY(-50%);left:min(calc(50% + 170px), calc(100% - 190px));width:380px;height:380px;color:var(--bronze);opacity:.32;pointer-events:none}
+@media (max-width:560px){ .drum{opacity:.16;width:320px;height:320px} }
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--bronze)}
+h1{font-size:clamp(28px,6vw,40px);line-height:1.15;letter-spacing:-.025em;margin:6px 0 10px;text-wrap:balance}
+.lede{color:var(--muted);margin:0;max-width:60ch}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.term{margin-top:28px}
+.term h2{font-family:var(--mono);font-size:14px;font-weight:700;margin:0 0 8px;color:var(--muted);letter-spacing:.04em}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;padding:14px 16px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .meta{flex:1 1 220px;min-width:0}
+.row .code{font-family:var(--mono);font-weight:700;font-size:16px}
+.row .sub{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:2px}
+.row .acts{display:flex;gap:8px}
+.row.off .code{color:var(--muted)}
+.foot{color:var(--muted);font-size:13px;padding-block:32px 48px}
+
+/* badges */
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;line-height:1.3;padding:4px 10px;border-radius:999px;border:1px solid transparent}
+.badge svg.i{width:15px;height:15px}
+.b-ok{background:var(--ok-weak);color:var(--ok)}
+.b-warn{background:var(--warn-weak);color:var(--warn)}
+.b-ai{background:var(--sunken);color:var(--muted);border-color:var(--line)}
+
+/* question */
+.progress{height:3px;background:var(--line)}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .25s}
+.q{padding-block:24px 8px}
+.q-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.q-num{font-family:var(--mono);font-weight:700;font-size:14px}
+.q-hint{font-size:13px;color:var(--muted)}
+.q-text{font-size:18px;line-height:1.55;font-weight:500;margin:0 0 18px;padding-left:14px;border-left:3px solid var(--eos)}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:flex-start;gap:12px;width:100%;min-height:52px;padding:12px 14px;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);transition:border-color .15s,background .15s}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt .k{flex:none;display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:7px;background:var(--sunken);font-family:var(--mono);font-weight:700;font-size:14px}
+.opt .t{flex:1;min-width:0;padding-top:2px}
+.opt .s{flex:none;padding-top:4px}
+.opt.sel{border-color:var(--accent);background:var(--accent-weak)}
+.opt.sel .k{background:var(--accent);color:var(--on-accent)}
+.opt.right{border-color:var(--ok);background:var(--ok-weak)}
+.opt.right .k{background:var(--ok);color:var(--surface)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-weak)}
+.opt.wrong .k{background:var(--bad);color:var(--surface)}
+.opt.dim{opacity:.6}
+.opt[disabled]{cursor:default}
+.after{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:16px}
+.verdict{font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.verdict.ok{color:var(--ok)} .verdict.bad{color:var(--bad)}
+.report{margin-left:auto;font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:6px;text-decoration:none}
+.report:hover{color:var(--accent)}
+.nav{display:flex;gap:10px;justify-content:space-between;padding-block:20px}
+
+/* grid */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:24px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.panel-head b{font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
+.cell{height:40px;border-radius:7px;border:1.5px solid var(--line);background:var(--surface);font-family:var(--mono);font-size:14px;font-weight:700;position:relative}
+.cell.cur{outline:2px solid var(--accent);outline-offset:1px}
+.cell.done{background:var(--accent-weak);border-color:var(--accent)}
+.cell.right{background:var(--ok-weak);border-color:var(--ok);color:var(--ok)}
+.cell.wrong{background:var(--bad-weak);border-color:var(--bad);color:var(--bad);border-style:dashed}
+.cell.flag::after{content:"";position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:2px;background:var(--warn)}
+.keys{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted);margin-top:10px}
+.keys span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:12px;height:12px;border-radius:3px;border:1.5px solid var(--line)}
+
+/* exam */
+.timer{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-weight:700;font-size:16px;padding:6px 10px;border-radius:8px;background:var(--sunken)}
+.timer.low{color:var(--bad);background:var(--bad-weak)}
+.flagbtn.on{color:var(--warn);border-color:var(--warn);background:var(--warn-weak)}
+.confirm{border:1.5px solid var(--warn);background:var(--warn-weak);border-radius:var(--r);padding:14px;margin-top:16px}
+.confirm p{margin:0 0 10px}
+.confirm .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+/* start */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.field{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:12px;border-top:1px solid var(--line)}
+.field:first-of-type{border-top:0}
+.field label{font-weight:500}
+.field small{display:block;color:var(--muted);font-size:13px;font-weight:400}
+.num{width:84px;min-height:44px;padding:0 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);font:700 16px var(--mono);text-align:center}
+.switch{position:relative;width:48px;height:28px;flex:none}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.switch span{position:absolute;inset:0;border-radius:999px;background:var(--line);transition:background .15s;pointer-events:none}
+.switch span::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.switch input:checked + span{background:var(--accent)}
+.switch input:checked + span::after{transform:translateX(20px)}
+.switch input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.rules{margin:16px 0 0;padding-left:20px;color:var(--muted);font-size:14px}
+
+/* result */
+.score{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;padding-block:28px 8px}
+.score .big{font-family:var(--mono);font-size:clamp(48px,14vw,72px);font-weight:700;line-height:1;letter-spacing:-.03em}
+.score .big small{font-size:.38em;color:var(--muted);font-weight:500}
+.score .stat{color:var(--muted);padding-bottom:8px}
+.meter{display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--line);margin:12px 0 24px}
+.meter i{display:block;height:100%}
+.wrong-list{display:grid;gap:12px}
+.wl{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.wl .qt{margin:4px 0 10px;font-weight:500}
+.ans{display:grid;gap:6px;font-size:14px}
+.ans div{display:flex;gap:8px;align-items:flex-start}
+.ans .tag{flex:none;font-size:12px;font-weight:600;width:64px;color:var(--muted);padding-top:1px}
+.ans .yours{color:var(--bad)} .ans .key{color:var(--ok)}
+.row-acts{display:flex;gap:10px;flex-wrap:wrap;padding-block:24px 48px}
+
+@media (max-width:480px){
+  .row .acts{width:100%} .row .acts .btn{flex:1}
+  .q-text{font-size:17px}
+  .bar-title span{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* quiz layout: question list in a left sidebar, question on the right */
+.wrap.wide{max-width:1120px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:0 32px;align-items:start}
+.side{padding-top:16px}
+.side-toggle{width:100%;justify-content:flex-start;font-size:14px}
+.side-toggle .spacer{flex:1}
+.side-body{display:none;margin:8px 0 0}
+.side.open .side-body{display:block}
+.main{min-width:0}
+@media (min-width:880px){
+  .layout{grid-template-columns:320px minmax(0,1fr)}
+  .side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 56px);padding-block:24px}
+  .side-toggle{display:none}
+  .side-body{display:block;margin:0;max-height:calc(100vh - 56px - 48px - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain}
+  .side-body .panel-head{position:sticky;top:-14px;margin:-14px -14px 10px;padding:14px 14px 10px;background:var(--surface);z-index:1;flex-wrap:nowrap}
+  .side-body .panel-head .btn{min-height:36px;padding:0 10px;font-size:14px;flex:none}
+  .side-body .panel-head b{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+}
+
+/* history, completion card, review */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;line-height:1.3;padding:3px 8px;border-radius:6px}
+.chip svg.i{width:14px;height:14px}
+.c-exam{background:var(--accent-weak);color:var(--accent)}
+.c-study{background:var(--bronze-weak);color:var(--bronze)}
+.hist-sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:24px 0 28px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:flex;flex-direction:column;min-width:0}
+.tile span{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tile b{font-family:var(--mono);font-size:28px;line-height:1.2;margin-top:4px}
+.tile small{font-size:12px;color:var(--muted)}
+.sec{font-size:16px;margin:0 0 10px}
+.hist{list-style:none;margin:0;padding:0}
+.hrow{align-items:center}
+.hnum{flex:none;width:36px;font-weight:700;font-size:14px;color:var(--muted)}
+.hl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.date{font-size:13px;color:var(--muted)}
+.hres{margin-top:4px;font-size:14px}
+.mini{display:flex;height:4px;max-width:220px;border-radius:999px;overflow:hidden;background:var(--line);margin-top:8px}
+.mini i{display:block;height:100%}
+.allok{display:inline-flex;align-items:center;gap:6px;min-height:44px;font-size:13px;font-weight:600;color:var(--ok)}
+.hist-note{font-size:13px;color:var(--muted);margin:12px 0 0}
+.acts-inline{display:flex;gap:8px;flex-wrap:wrap}
+.done-card{background:var(--surface);border:1.5px solid var(--accent);border-radius:var(--r);padding:16px 18px;margin-top:24px}
+.done-card:focus-visible{outline-offset:3px}
+.done-card .score{padding-block:6px 0}
+.done-card .big{font-size:44px}
+.done-card .meter{margin:12px 0 14px}
+.done-card .acts{display:flex;gap:8px;flex-wrap:wrap}
+.prev-pick{font-size:13px;color:var(--muted)}
+.side-meta{display:flex;align-items:center;gap:8px;margin:-4px 0 10px}
+.side-note{font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.submit-hint{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font-size:14px;padding:8px 8px 8px 14px;border-radius:var(--r);background:var(--sunken);color:var(--muted)}
+.submit-hint > svg.i{color:var(--warn)}
+.submit-hint span{flex:1 1 200px}
+.submit-hint b{color:var(--fg)}
+.submit-hint.ok{background:var(--ok-weak);color:var(--ok);padding-block:12px}
+.submit-hint.ok > svg.i{color:var(--ok)}
+.submit-hint .btn{min-height:40px;font-size:14px;padding:0 12px}
+.bar .btn[disabled]{opacity:.5}
+.bar .btn{white-space:nowrap;padding:0 12px}
+.iconbtn{flex:none}
+@media (max-width:480px){
+  .hist-sum{gap:6px}
+  .tile{padding:10px}
+  .tile b{font-size:22px}
+  .hrow .acts{width:100%}
+  .hrow .acts .btn{flex:1}
+  .row .acts .hist-btn{flex:none;width:44px;padding:0}
+  .row .acts .hist-btn .lbl{display:none}
+  .done-card .acts .btn{flex:1 1 140px}
+}
+</style>
+
+<div class="proto">Bản mẫu giao diện · lịch sử làm bài &amp; ôn câu sai (lịch sử mẫu 3 lần) · dữ liệu 5 câu thật của FA24 · B5-FE, nhãn đáp án chỉ là ví dụ</div>
+<div id="app"></div>
+
+<script>
+const I = {
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  warn:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/>',
+  shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  cpu:'<rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M15 2v3M9 2v3M15 19v3M9 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>',
+  history:'<path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3.5 2"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  up:'<path d="m18 15-6-6-6 6"/>', down:'<path d="m6 9 6 6 6-6"/>',
+  left:'<path d="m15 18-6-6 6-6"/>', right:'<path d="m9 18 6-6-6-6"/>',
+  back:'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  reset:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M12 7v4M12 14h.01"/>',
+  book:'<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+};
+const ic = (n, extra='') => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true" ${extra}>${I[n]}</svg>`;
+/* Đông Sơn drum face, drawn from geometry: 14-point star, ring bands of ladder ticks,
+   tangent circles with dots, and saw-teeth. `mini` draws only the star for the logo. */
+function drumSvg(size, cls, mini=false){
+  const c = 100, P = (r,a)=>[(c+r*Math.cos(a)).toFixed(2),(c+r*Math.sin(a)).toFixed(2)];
+  let s = '';
+  const star = [];
+  for(let i=0;i<28;i++){ const a=Math.PI*i/14-Math.PI/2; star.push(P(i%2?(mini?34:9):(mini?96:24),a).join(',')); }
+  s += `<polygon points="${star.join(' ')}" fill="currentColor"/>`;
+  if(mini) return `<svg class="${cls}" viewBox="0 0 200 200" aria-hidden="true">${s}</svg>`;
+  const ring = r => `<circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="currentColor" stroke-width="1.2"/>`;
+  [27,31,42,44,58,60,76,78,97].forEach(r=>s+=ring(r));
+  for(let i=0;i<90;i++){ const a=i*Math.PI/45; const [x1,y1]=P(31,a),[x2,y2]=P(42,a); s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="currentColor" stroke-width="1"/>`; }
+  for(let i=0;i<20;i++){ const a=i*Math.PI/10; const [x,y]=P(51,a); s+=`<circle cx="${x}" cy="${y}" r="6.2" fill="none" stroke="currentColor" stroke-width="1.1"/><circle cx="${x}" cy="${y}" r="1.8" fill="currentColor"/>`; }
+  for(let i=0;i<48;i++){ const a=i*Math.PI/24, b=(i+.5)*Math.PI/24, d=(i+1)*Math.PI/24; const p=[P(60,a),P(74,b),P(60,d)].map(q=>q.join(',')).join(' '); s+=`<polyline points="${p}" fill="none" stroke="currentColor" stroke-width="1"/>`; }
+  for(let i=0;i<120;i++){ const a=i*Math.PI/60; const [x1,y1]=P(78,a),[x2,y2]=P(97,a); s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="currentColor" stroke-width=".8"/>`; }
+  return `<svg class="${cls}" viewBox="0 0 200 200" aria-hidden="true">${s}</svg>`;
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const EXAM = {
+  id:'FA24-B5-FE', term:'FA24', code:'B5-FE',
+  questions:[
+    {n:1, text:'Giải quyết hai vấn đề nào sau đây cần phải đặt trong mối quan hệ với cộng đồng quốc gia - dân tộc thống nhất theo định hướng xã hội chủ nghĩa?',
+     options:{A:'Văn hóa và hội nhập quốc tế',B:'Tư sản và vô sản',C:'Giáo dục và y tế',D:'Dân tộc và tôn giáo'}, answer:'D', status:'verified', votes:3},
+    {n:2, text:'Điền cụm từ thích hợp vào (...): Tôn giáo là một hiện tượng ... - ... do con người sáng tạo.',
+     options:{A:'Xã hội/ văn hóa',B:'Kinh tế/ văn hóa',C:'Chính trị/ xã hội',D:'Giáo dục/ y tế'}, answer:'A', status:'verified', votes:1},
+    {n:3, text:'Theo chủ nghĩa Mác - Lênin, tôn giáo là gì?',
+     options:{A:'Là một thiết chế xã hội phản ánh chân thật hiện thực khách quan',B:'Là một hình thái ý thức xã hội, phản ánh hư ảo hiện thực khách quan',C:'Là một cơ sở xã hội, phản ánh các ý chí, nguyện vọng của tín đồ theo một giáo lý nào đó',D:'Là một thực thể xã hội, điều chỉnh tâm lý con người hiệu quả'}, answer:'B', status:'ai-only'},
+    {n:4, text:'Bản chất dân chủ của chế độ nước ta hiện nay được hiểu như thế nào?',
+     options:{A:'Chế độ ta là do nhân dân làm chủ, quyền lực thuộc về nhân dân',B:'Chế độ ta là do Đảng Cộng sản Việt Nam làm chủ, là đại diện ý chí, nguyện vọng của nhân dân',C:'Chế độ ta là do giai cấp công nhân làm chủ, quyền lực thuộc về giai cấp công nhân',D:'Chế độ ta là do cá nhân làm chủ, được hiện thực hóa thông qua vai trò làm chủ duy nhất của Đảng Cộng sản Việt Nam'}, answer:'A', status:'disputed', comment:'B', votes:2},
+    {n:5, text:'Dân chủ được hiểu là:',
+     options:{A:'Một giá trị xã hội phản ánh các quyền cơ bản của con người; là một hình thức tổ chức nhà nước của giai cấp cầm quyền; có quá trình ra đời, phát triển cùng với lịch sử xã hội nhân loại',B:'Một giá trị xã hội phản ánh các quyền cơ bản của con người; là một hình thức tổ chức nhà nước của giai cấp tư sản cầm quyền; có quá trình ra đời, phát triển cùng với lịch sử xã hội nhân loại',C:'Một giá trị xã hội phản ánh các quyền cơ bản của con người; là một hình thức tổ chức nhà nước của giai cấp thống trị cầm quyền; có quá trình ra đời, phát triển từ xã hội chiếm hữu nô lệ',D:'Một giá trị xã hội phản ánh các quyền cơ bản của con người; là một hình thức tổ chức nhà nước của giai cấp vô sản cầm quyền; có quá trình ra đời, phát triển cùng với lịch sử xã hội nhân loại'}, answer:'A', status:'ai-only'},
+  ]
+};
+const TERMS = [
+  ['FA26',['C1-FE','C1-FE-RE','C2-FE']], ['FA25',['FE-RE']], ['SP25',['B5-FE','FE']],
+  ['FA24',['B5-FE','B5-FE-RE','FE','FE-RE']], ['SU24',['B5-FE']],
+];
+
+let view = 'home';
+let study = {i:0, picks:{}, recorded:false, k:null};
+let exam = null;          // {i, picks, flags:Set, order, endAt, submitted, confirm, auto, k}
+let review = null;        // {k, items:[question index], i, picks:{}}
+let tick = null;
+let navOpen = false;      // question list expanded (narrow screens only)
+let focusCard = false;    // focus the completion card after the next render
+const N = EXAM.questions.length;
+const isSplit = () => view==='study' || view==='exam' || view==='review';
+const DAY = 864e5;
+// Sample history so the History page has something to show (prototype only).
+const HISTORY = [
+  {mode:'study', at:Date.now()-3*DAY, correct:3, total:5, responses:{1:'D',2:'B',3:'B',4:'B',5:'A'}},
+  {mode:'exam',  at:Date.now()-2*DAY, correct:5, total:5, score10:10, responses:{1:'D',2:'A',3:'B',4:'A',5:'A'}},
+  {mode:'exam',  at:Date.now()-1*DAY, correct:2, total:5, score10:4, auto:true, responses:{1:'D',2:'C',4:'B',5:'A'}},
+];
+
+/* ---------- helpers ---------- */
+const fmtDate = t => { const d=new Date(t); return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`; };
+const countRight = picks => EXAM.questions.filter(q=>picks[q.n]===q.answer).length;
+// Wrong questions are recomputed from the current answer key (spec 3.2).
+const wrongOf = a => EXAM.questions.map((q,i)=>i).filter(i=>a.responses[EXAM.questions[i].n]!==EXAM.questions[i].answer);
+function stats(){
+  const ex = HISTORY.filter(a=>a.mode==='exam');
+  return {exams:ex.length, studies:HISTORY.length-ex.length, best:ex.length?Math.max(...ex.map(a=>a.score10)):null};
+}
+function record(a){ HISTORY.push({at:Date.now(), ...a}); return HISTORY.length; }
+const modeChip = m => m==='exam' ? `<span class="chip c-exam">${ic('clock')}Thi thử</span>` : `<span class="chip c-study">${ic('book')}Ôn tập</span>`;
+const meter = (ok,bad,tot) => `<div class="meter" aria-hidden="true"><i style="width:${ok/tot*100}%;background:var(--ok)"></i><i style="width:${bad/tot*100}%;background:var(--bad)"></i></div>`;
+
+function badge(q){
+  if(q.status==='verified') return `<span class="badge b-ok">${ic('shield')}Đã đối chiếu · ${q.votes} phiếu</span>`;
+  if(q.status==='disputed') return `<span class="badge b-warn">${ic('warn')}Có tranh cãi · comment chọn ${q.comment} (${q.votes} phiếu)</span>`;
+  return `<span class="badge b-ai">${ic('cpu')}Đáp án AI, chưa đối chiếu</span>`;
+}
+const reportLink = q => `<a class="report" href="#" data-act="noop">${ic('msg')}Báo lỗi câu này</a>`;
+
+function topbar(title, sub, right='', back='home'){
+  return `<header class="bar"><div class="wrap${isSplit()?' wide':''}">
+    <button class="iconbtn" data-act="${back}" aria-label="${back==='history'?'Về lịch sử':'Về trang chủ'}">${ic('back')}</button>
+    <div class="bar-title"><b>${title}</b><span>${sub}</span></div>
+    <div class="spacer"></div>${right}</div></header>`;
+}
+// Question list in a left sidebar (collapsible on narrow screens). Only the
+// current cell is in the tab order; arrow keys move between questions.
+function layout(side, body){
+  return `<div class="wrap wide layout">
+    <aside class="side${navOpen?' open':''}" aria-label="Danh sách câu">
+      <button class="btn side-toggle" data-act="toggleNav" aria-expanded="${navOpen}" aria-controls="qnav">${ic('grid')}<span>${side.label}</span><span class="spacer"></span>${ic(navOpen?'up':'down')}</button>
+      <section class="panel side-body" id="qnav">${side.html}</section>
+    </aside>
+    <main class="main">${body}</main>
+  </div>`;
+}
+// Completion card shown at the top of the right column once every question
+// in the round is answered. Answers stay reviewable underneath.
+function doneCard(o){
+  return `<section class="done-card" id="doneCard" tabindex="-1" aria-labelledby="doneTitle">
+    <div class="eyebrow" id="doneTitle">${o.eyebrow}</div>
+    <div class="score"><div class="big">${o.ok}<small>/${o.total}</small></div><div class="stat">${o.note}</div></div>
+    ${meter(o.ok,o.total-o.ok,o.total)}
+    <div class="acts">${o.acts}</div></section>`;
+}
+function optButtons(q, picked, act){
+  let opts = '';
+  for(const [k,t] of Object.entries(q.options)){
+    let cls='opt', s='';
+    if(picked){
+      if(k===q.answer){cls+=' right'; s=ic('check');}
+      else if(k===picked){cls+=' wrong'; s=ic('x');}
+      else cls+=' dim';
+    }
+    opts += `<button class="${cls}" data-act="${act}" data-k="${k}" ${picked?'disabled':''}><span class="k">${k}</span><span class="t">${esc(t)}</span><span class="s">${s}</span></button>`;
+  }
+  return opts;
+}
+const verdict = (q,picked) => `<span class="verdict ${picked===q.answer?'ok':'bad'}">${picked===q.answer?ic('check')+'Chính xác':ic('x')+'Chưa đúng · đáp án '+q.answer}</span>`;
+
+/* ---------- home ---------- */
+function renderHome(){
+  const total = TERMS.reduce((a,[,c])=>a+c.length,0);
+  const st = stats();
+  let html = `<header class="bar"><div class="wrap"><div class="brand">${drumSvg(26,'star',true)}<span class="mark">MLN131</span>Phòng thi thử</div></div></header>
+  <section class="hero-band">${drumSvg(380,'drum')}<div class="wrap"><div class="hero">
+      <div class="eyebrow">Chủ nghĩa xã hội khoa học · Đề FE cũ</div>
+      <h1>Ôn theo đúng đề đã thi</h1>
+      <p class="lede">${total} mã đề, mỗi đề 60 câu chép lại từ đề gốc. Ôn tập để biết đúng sai ngay, hoặc thi thử có giờ như phòng thi.</p>
+      <div class="legend">
+        <span class="badge b-ok">${ic('shield')}Đã đối chiếu</span>
+        <span class="badge b-warn">${ic('warn')}Có tranh cãi</span>
+        <span class="badge b-ai">${ic('cpu')}Đáp án AI, chưa đối chiếu</span>
+      </div>
+    </div></div></section>
+  <main class="wrap">`;
+  for(const [term,codes] of TERMS){
+    html += `<section class="term"><h2>${term}</h2><div class="list">`;
+    for(const code of codes){
+      const live = term===EXAM.term && code===EXAM.code;
+      const pending = term==='SU24';
+      const sub = live
+        ? `<span>${N} câu (mẫu)</span><span>1 câu tranh cãi</span>`+
+          (st.exams?`<span>Thi thử ${st.exams} lần</span><span>Cao nhất <b class="mono">${st.best.toFixed(2)}</b></span>`:'<span>Chưa thi thử</span>')+
+          (st.studies?`<span>Ôn tập ${st.studies} lần</span>`:'')
+        : pending ? `<span>Đang tải đề · 52/60 ảnh</span>` : `<span>60 câu</span><span>Chưa có trong bản mẫu</span>`;
+      const hist = live && HISTORY.length ? `<button class="btn hist-btn" data-act="history" aria-label="Lịch sử làm bài">${ic('history')}<span class="lbl">Lịch sử</span></button>` : '';
+      html += `<div class="row${live?'':' off'}"><div class="meta"><div class="code">${term} · ${code}</div><div class="sub">${sub}</div></div>
+        <div class="acts">${hist}
+          <button class="btn" data-act="study" ${live?'':'disabled'}>${ic('book')}Ôn tập</button>
+          <button class="btn primary" data-act="examStart" ${live?'':'disabled'}>${ic('clock')}Thi thử</button>
+        </div></div>`;
+    }
+    html += `</div></section>`;
+  }
+  html += `<p class="foot">Không chính thức. Đề được chép lại từ ảnh và đáp án có thể sai. Thấy lỗi thì bấm “Báo lỗi câu này” trong từng câu.</p></main>`;
+  return html;
+}
+
+/* ---------- history ---------- */
+function renderHistory(){
+  const st = stats();
+  const title = `${EXAM.term} · ${EXAM.code}`;
+  if(!HISTORY.length) return topbar(title,'Lịch sử làm bài')+`<main class="wrap"><div class="notice"><h1>Chưa có lần làm nào</h1>
+    <p>Làm đủ ${N} câu ở Ôn tập hoặc Thi thử thì lần làm được lưu ở đây, trên trình duyệt này.</p>
+    <div class="acts-inline"><button class="btn" data-act="study">${ic('book')}Ôn tập</button><button class="btn primary" data-act="examStart">${ic('clock')}Thi thử</button></div></div></main>`;
+  const rows = HISTORY.map((a,idx)=>({a,k:idx+1})).reverse().map(({a,k})=>{
+    const wrong = wrongOf(a).length;
+    const res = a.mode==='exam'
+      ? `<b class="mono">${a.score10.toFixed(2)}</b> điểm · đúng ${a.correct}/${a.total}${a.auto?' · hết giờ, tự nộp':''}`
+      : `đúng <b class="mono">${a.correct}/${a.total}</b>`;
+    return `<li class="row hrow"><span class="hnum mono" aria-label="Lần ${k}">#${k}</span>
+      <div class="meta"><div class="hl">${modeChip(a.mode)}<span class="date mono">${fmtDate(a.at)}</span></div>
+        <div class="hres">${res}</div>
+        <div class="mini" aria-hidden="true"><i style="width:${a.correct/a.total*100}%;background:var(--ok)"></i><i style="width:${(a.total-a.correct)/a.total*100}%;background:var(--bad)"></i></div></div>
+      <div class="acts">${wrong?`<button class="btn" data-act="review" data-k="${k}">${ic('target')}Ôn ${wrong} câu sai</button>`:`<span class="allok">${ic('check')}Không sai câu nào</span>`}</div></li>`;
+  }).join('');
+  return topbar(title,'Lịch sử làm bài')+`<main class="wrap">
+    <div class="hist-sum">
+      <div class="tile"><span>Thi thử</span><b>${st.exams}</b><small>lần</small></div>
+      <div class="tile"><span>Cao nhất</span><b>${st.best==null?'—':st.best.toFixed(2)}</b><small>${st.best==null?'chưa thi thử':'/10 điểm'}</small></div>
+      <div class="tile"><span>Ôn tập</span><b>${st.studies}</b><small>lần</small></div>
+    </div>
+    <h2 class="sec">Các lần làm <span class="q-hint">· mới nhất ở trên</span></h2>
+    <ol class="list hist">${rows}</ol>
+    <p class="hist-note">Lịch sử chỉ lưu trên trình duyệt này.</p>
+    <div class="row-acts"><button class="btn" data-act="study">${ic('book')}Ôn tập</button><button class="btn primary" data-act="examStart">${ic('clock')}Thi thử</button></div>
+  </main>`;
+}
+
+/* ---------- study ---------- */
+function studyPick(k){
+  const q = EXAM.questions[study.i];
+  if(study.picks[q.n]) return;
+  study.picks[q.n] = k;
+  if(!study.recorded && Object.keys(study.picks).length===N){
+    study.k = record({mode:'study', correct:countRight(study.picks), total:N, responses:{...study.picks}});
+    study.recorded = true; focusCard = true;
+  }
+}
+function renderStudy(){
+  const q = EXAM.questions[study.i];
+  const picked = study.picks[q.n];
+  const done = Object.keys(study.picks).length;
+  const correct = countRight(study.picks);
+  const complete = study.recorded;
+  const wrong = N-correct;
+  const after = picked ? `<div class="after">${verdict(q,picked)}${badge(q)}${reportLink(q)}</div>` : '';
+  const cells = EXAM.questions.map((x,i)=>{
+    const p=study.picks[x.n]; let c='cell';
+    if(p) c+= p===x.answer?' right':' wrong';
+    if(i===study.i) c+=' cur';
+    return `<button class="${c}" data-act="go" data-i="${i}" aria-label="Câu ${x.n}${p?(p===x.answer?', đúng':', sai'):''}"${i===study.i?' aria-current="true"':' tabindex="-1"'}>${x.n}</button>`;
+  }).join('');
+  const card = complete ? doneCard({
+    eyebrow:`Hoàn thành lượt ôn · lần #${study.k}`, ok:correct, total:N, note:'câu đúng · đã lưu vào lịch sử',
+    acts:(wrong?`<button class="btn primary" data-act="review" data-k="${study.k}">${ic('target')}Ôn ${wrong} câu sai</button>`:'')+
+      `<button class="btn${wrong?'':' primary'}" data-act="newRound">${ic('reset')}Lượt mới</button><button class="btn ghost" data-act="history">${ic('history')}Xem lịch sử</button>`,
+  }) : '';
+  return topbar(`${EXAM.term} · ${EXAM.code}`,'Ôn tập', `<span class="mono" style="font-size:14px;color:var(--muted)">${done}/${N}</span>`)+
+  `<div class="progress"><i style="width:${done/N*100}%"></i></div>`+
+  layout({
+    label:`Câu ${q.n}/${N} · đúng ${correct}/${done}`,
+    html:`<div class="panel-head"><b>${complete?`Hoàn thành · đúng ${correct}/${N}`:`Đúng ${correct}/${done} câu đã làm`}</b>${complete?'':`<button class="btn ghost" data-act="resetStudy">${ic('reset')}Làm lại</button>`}</div>
+      <div class="grid">${cells}</div>
+      <div class="keys"><span><i class="sw" style="background:var(--ok-weak);border-color:var(--ok)"></i>Đúng</span><span><i class="sw" style="background:var(--bad-weak);border-color:var(--bad);border-style:dashed"></i>Sai</span><span><i class="sw"></i>Chưa làm</span></div>`,
+  }, `${card}
+    <article class="q">
+      <div class="q-head"><span class="q-num">Câu ${q.n}/${N}</span><span class="q-hint">${complete?'Xem lại đáp án':'Chọn 1 đáp án · phím A–D'}</span></div>
+      <p class="q-text">${esc(q.text)}</p>
+      <div class="opts">${optButtons(q,picked,'pick')}</div>${after}
+    </article>
+    <div class="nav">
+      <button class="btn" data-act="prev" ${study.i===0?'disabled':''}>${ic('left')}Câu trước</button>
+      <button class="btn primary" data-act="next" ${study.i===N-1?'disabled':''}>Câu sau${ic('right')}</button>
+    </div>`);
+}
+
+/* ---------- review wrong answers ---------- */
+function startReview(k){
+  const a = HISTORY[k-1]; if(!a) return;
+  const items = wrongOf(a); if(!items.length) return;
+  review = {k, items, i:0, picks:{}}; navOpen = false; view = 'review';
+}
+function reviewPick(k){
+  const q = EXAM.questions[review.items[review.i]];
+  if(review.picks[q.n]) return;
+  review.picks[q.n] = k;
+  if(Object.keys(review.picks).length===review.items.length) focusCard = true;
+}
+function renderReview(){
+  const a = HISTORY[review.k-1];
+  const Y = review.items.length;
+  const q = EXAM.questions[review.items[review.i]];
+  const picked = review.picks[q.n];
+  const done = Object.keys(review.picks).length;
+  const correct = EXAM.questions.filter(x=>review.picks[x.n] && review.picks[x.n]===x.answer).length;
+  const before = a.responses[q.n];
+  const after = picked ? `<div class="after">${verdict(q,picked)}<span class="prev-pick">Lần #${review.k}: ${before?`bạn chọn <b class="mono">${before}</b>`:'bỏ trống'}</span>${badge(q)}${reportLink(q)}</div>` : '';
+  const cells = review.items.map((qi,i)=>{
+    const x=EXAM.questions[qi], p=review.picks[x.n]; let c='cell';
+    if(p) c+= p===x.answer?' right':' wrong';
+    if(i===review.i) c+=' cur';
+    return `<button class="${c}" data-act="rgo" data-i="${i}" aria-label="Câu ${x.n} đề gốc${p?(p===x.answer?', đúng':', vẫn sai'):''}"${i===review.i?' aria-current="true"':' tabindex="-1"'}>${x.n}</button>`;
+  }).join('');
+  const card = done===Y ? doneCard({
+    eyebrow:`Xong ôn câu sai · lần #${review.k}`, ok:correct, total:Y, note:'câu đúng · lượt này không lưu vào lịch sử',
+    acts:`<button class="btn primary" data-act="review" data-k="${review.k}">${ic('reset')}Ôn lại</button><button class="btn" data-act="history">${ic('history')}Về lịch sử</button>`,
+  }) : '';
+  return topbar(`${EXAM.term} · ${EXAM.code}`,`Ôn câu sai · lần #${review.k}`, `<span class="mono" style="font-size:14px;color:var(--muted)">${done}/${Y}</span>`, 'history')+
+  `<div class="progress"><i style="width:${done/Y*100}%"></i></div>`+
+  layout({
+    label:`Câu sai ${review.i+1}/${Y} · đúng ${correct}/${done}`,
+    html:`<div class="panel-head"><b>Câu sai của lần #${review.k}</b><span class="q-hint">${Y} câu</span></div>
+      <p class="side-meta">${modeChip(a.mode)}<span class="date mono">${fmtDate(a.at)}</span></p>
+      <div class="grid">${cells}</div>
+      <div class="keys"><span><i class="sw" style="background:var(--ok-weak);border-color:var(--ok)"></i>Đúng</span><span><i class="sw" style="background:var(--bad-weak);border-color:var(--bad);border-style:dashed"></i>Vẫn sai</span><span><i class="sw"></i>Chưa làm</span></div>
+      <p class="side-note">Số trên ô là số câu trong đề gốc. Lượt ôn này không lưu tiến độ và không tính vào lịch sử.</p>`,
+  }, `${card}
+    <article class="q">
+      <div class="q-head"><span class="q-num">Câu ${q.n}</span><span class="q-hint">đề gốc · câu sai ${review.i+1}/${Y} · phím A–D</span></div>
+      <p class="q-text">${esc(q.text)}</p>
+      <div class="opts">${optButtons(q,picked,'rpick')}</div>${after}
+    </article>
+    <div class="nav">
+      <button class="btn" data-act="rprev" ${review.i===0?'disabled':''}>${ic('left')}Câu trước</button>
+      <button class="btn primary" data-act="rnext" ${review.i===Y-1?'disabled':''}>Câu sau${ic('right')}</button>
+    </div>`);
+}
+
+/* ---------- exam ---------- */
+function renderExamStart(){
+  return topbar(`${EXAM.term} · ${EXAM.code}`,'Thi thử')+`<main class="wrap" style="padding-block:28px 48px">
+    <div class="eyebrow">Thi thử</div><h1 style="font-size:28px">Sẵn sàng vào phòng thi</h1>
+    <form class="card" id="startForm">
+      <div class="field"><label for="mins">Thời gian<small>Đề FE thật: 60 phút</small></label><span><input class="num" id="mins" type="number" min="1" max="180" value="60"> <span style="color:var(--muted)">phút</span></span></div>
+      <div class="field"><label for="shuf">Xáo trộn thứ tự câu<small>Tắt để làm đúng thứ tự đề gốc</small></label><span class="switch"><input id="shuf" type="checkbox"><span></span></span></div>
+      <button class="btn primary" style="width:100%;margin-top:12px" type="submit">${ic('clock')}Bắt đầu · ${N} câu</button>
+      <ul class="rules"><li>Không hiện đáp án cho tới khi nộp bài.</li><li>Phải làm đủ các câu mới nộp được. Hết giờ bài tự nộp, câu bỏ trống tính là sai.</li><li>Tải lại trang không mất bài đang làm.</li></ul>
+    </form></main>`;
+}
+function remaining(){ return Math.max(0, Math.round((exam.endAt-Date.now())/1000)); }
+const fmt = s => `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+function nextBlank(){
+  for(let s=1;s<=N;s++){ const j=(exam.i+s)%N; if(!exam.picks[EXAM.questions[exam.order[j]].n]) return j; }
+  return -1;
+}
+function renderExam(){
+  const q = EXAM.questions[exam.order[exam.i]];
+  const picked = exam.picks[q.n];
+  const answered = Object.keys(exam.picks).length;
+  const r = remaining();
+  let opts='';
+  for(const [k,t] of Object.entries(q.options))
+    opts += `<button class="opt${picked===k?' sel':''}" data-act="epick" data-k="${k}" aria-pressed="${picked===k}"><span class="k">${k}</span><span class="t">${esc(t)}</span></button>`;
+  const cells = exam.order.map((qi,i)=>{
+    const x=EXAM.questions[qi]; let c='cell';
+    if(exam.picks[x.n]) c+=' done';
+    if(exam.flags.has(x.n)) c+=' flag';
+    if(i===exam.i) c+=' cur';
+    return `<button class="${c}" data-act="ego" data-i="${i}" aria-label="Câu ${i+1}${exam.picks[x.n]?', đã làm':''}${exam.flags.has(x.n)?', cần xem lại':''}"${i===exam.i?' aria-current="true"':' tabindex="-1"'}>${i+1}</button>`;
+  }).join('');
+  const left = N-answered, flagged = exam.flags.size;
+  // Submit unlocks only when every question is answered (spec 3.1).
+  const hint = left
+    ? `<div class="submit-hint" id="submitHint">${ic('warn')}<span>Còn <b>${left}</b> câu chưa làm · làm đủ mới nộp được</span><button class="btn" data-act="nextBlank">Đến câu chưa làm${ic('right')}</button></div>`
+    : `<div class="submit-hint ok">${ic('check')}<span>Đã làm đủ ${N} câu, có thể nộp bài.</span></div>`;
+  const confirm = exam.confirm ? `<div class="confirm" role="alert"><p><b>Nộp bài?</b> Bạn đã làm hết ${N} câu.${flagged?` ${flagged} câu đang đánh dấu xem lại.`:''}</p>
+     <div class="acts"><button class="btn primary" data-act="submit">Nộp bài</button><button class="btn" data-act="cancelSubmit">Làm tiếp</button></div></div>` : '';
+  return topbar(`${EXAM.term} · ${EXAM.code}`,`Thi thử · đã làm ${answered}/${N}`,
+    `<span class="timer${r<300?' low':''}" id="timer" aria-live="off">${ic('clock')}${fmt(r)}</span><button class="btn primary" data-act="askSubmit" ${left?'disabled aria-describedby="submitHint"':''}>Nộp bài</button>`)+
+  `<div class="progress"><i style="width:${answered/N*100}%"></i></div>`+
+  layout({
+    label:`Câu ${exam.i+1}/${N} · đã làm ${answered}${flagged?` · ${flagged} xem lại`:''}`,
+    html:`<div class="panel-head"><b>Danh sách câu</b><span class="q-hint">${answered}/${N} đã làm</span></div>
+      <div class="grid">${cells}</div>
+      <div class="keys"><span><i class="sw" style="background:var(--accent-weak);border-color:var(--accent)"></i>Đã làm</span><span><i class="sw" style="background:var(--warn);border-color:var(--warn)"></i>Xem lại</span><span><i class="sw"></i>Chưa làm</span></div>`,
+  }, `
+    <article class="q">
+      <div class="q-head"><span class="q-num">Câu ${exam.i+1}/${N}</span><span class="q-hint">(Choose 1 answer)</span><span class="spacer" style="flex:1"></span>
+        <button class="btn flagbtn${exam.flags.has(q.n)?' on':''}" data-act="flag" aria-pressed="${exam.flags.has(q.n)}">${ic('flag')}Xem lại</button></div>
+      <p class="q-text">${esc(q.text)}</p>
+      <div class="opts">${opts}</div>
+    </article>
+    <div class="nav">
+      <button class="btn" data-act="eprev" ${exam.i===0?'disabled':''}>${ic('left')}Câu trước</button>
+      <button class="btn primary" data-act="enext" ${exam.i===N-1?'disabled':''}>Câu sau${ic('right')}</button>
+    </div>
+    ${hint}
+    ${confirm}`);
+}
+
+/* ---------- result ---------- */
+function renderResult(){
+  const qs = EXAM.questions;
+  const right = qs.filter(q=>exam.picks[q.n]===q.answer);
+  const wrong = qs.filter(q=>exam.picks[q.n]!==q.answer);
+  const blank = qs.filter(q=>!exam.picks[q.n]).length;
+  const score = Math.round(right.length/N*1000)/100;
+  const items = wrong.map(q=>{
+    const p = exam.picks[q.n];
+    return `<div class="wl"><span class="q-num">Câu ${q.n}</span><p class="qt">${esc(q.text)}</p>
+      <div class="ans">
+        <div><span class="tag">Bạn chọn</span><span class="yours">${p?`<b>${p}.</b> ${esc(q.options[p])}`:'Bỏ trống'}</span></div>
+        <div><span class="tag">Đáp án</span><span class="key"><b>${q.answer}.</b> ${esc(q.options[q.answer])}</span></div>
+      </div><div class="after" style="margin-top:10px">${badge(q)}${reportLink(q)}</div></div>`;
+  }).join('');
+  const acts = (wrong.length?`<button class="btn primary" data-act="review" data-k="${exam.k}">${ic('target')}Ôn ${wrong.length} câu sai</button>`:'')+
+    `<button class="btn${wrong.length?'':' primary'}" data-act="examStart">${ic('reset')}Thi lại</button><button class="btn" data-act="history">${ic('history')}Xem lịch sử</button><button class="btn ghost" data-act="study">${ic('book')}Ôn tập đề này</button>`;
+  return topbar(`${EXAM.term} · ${EXAM.code}`,'Kết quả thi thử')+`<main class="wrap">
+    <div class="score"><div class="big">${score.toFixed(2)}<small> /10</small></div>
+      <div class="stat">${right.length}/${N} câu đúng · ${wrong.length-blank} sai · ${blank} bỏ trống${exam.auto?' · hết giờ, tự nộp':''}<br>Lần #${exam.k} · đã lưu vào lịch sử</div></div>
+    ${meter(right.length, wrong.length-blank, N)}
+    <div class="row-acts" style="padding-block:0 20px">${acts}</div>
+    <h2 style="font-size:18px;margin:0 0 12px">${wrong.length?`Câu sai / bỏ trống (${wrong.length})`:'Không sai câu nào'}</h2>
+    <div class="wrong-list">${items}</div>
+    <div class="row-acts">${acts}</div>
+  </main>`;
+}
+
+/* ---------- controller ---------- */
+const app = document.getElementById('app');
+const VIEWS = {home:renderHome, history:renderHistory, study:renderStudy, review:renderReview, examStart:renderExamStart, exam:renderExam, result:renderResult};
+function render(){
+  clearInterval(tick); tick=null;
+  const ae = document.activeElement, onCell = !!(ae && ae.classList && ae.classList.contains('cell'));
+  const fk = ae && ae.dataset && ae.dataset.act ? `[data-act="${ae.dataset.act}"]`+(ae.dataset.k?`[data-k="${ae.dataset.k}"]`:'') : null;
+  const sideTop = app.querySelector('.side-body')?.scrollTop || 0;
+  app.innerHTML = VIEWS[view]();
+  const want = onCell ? '.cell.cur' : fk;
+  if(want){ const el = app.querySelector(want); if(el && !el.disabled) el.focus({preventScroll:true}); }
+  if(focusCard){ focusCard=false; const c=document.getElementById('doneCard'); if(c){ c.focus({preventScroll:true}); window.scrollTo(0,0); } }
+  keepCurInView(sideTop);
+  if(view==='exam'){
+    tick = setInterval(()=>{
+      const r = remaining(), el = document.getElementById('timer');
+      if(el){ el.innerHTML = ic('clock')+fmt(r); el.classList.toggle('low', r<300); }
+      if(r<=0) submit(true);
+    },1000);
+  }
+  const f = document.getElementById('startForm');
+  if(f) f.addEventListener('submit', e=>{
+    e.preventDefault();
+    const mins = Math.min(180, Math.max(1, parseInt(document.getElementById('mins').value,10)||60));
+    const order = [...Array(N).keys()];
+    if(document.getElementById('shuf').checked) for(let i=N-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[order[i],order[j]]=[order[j],order[i]];}
+    exam = {i:0, picks:{}, flags:new Set(), order, endAt:Date.now()+mins*60000, submitted:false, confirm:false, k:null};
+    navOpen=false; view='exam'; render(); window.scrollTo(0,0);
+  });
+}
+// innerHTML resets the sidebar's own scroll; restore it, then nudge so the
+// current cell stays visible without scrolling the window.
+function keepCurInView(top){
+  const box = app.querySelector('.side-body'), cur = box && box.querySelector('.cell.cur');
+  if(!box || !cur || box.scrollHeight<=box.clientHeight) return;
+  box.scrollTop = top;
+  const pad=8, y=cur.offsetTop-box.offsetTop;
+  if(y<box.scrollTop+pad) box.scrollTop=y-pad;
+  else if(y+cur.offsetHeight>box.scrollTop+box.clientHeight-pad) box.scrollTop=y+cur.offsetHeight-box.clientHeight+pad;
+}
+function submit(auto=false){
+  if(!exam || exam.submitted) return;
+  exam.submitted = true; exam.auto = auto; exam.confirm = false;
+  const correct = countRight(exam.picks);
+  exam.k = record({mode:'exam', correct, total:N, score10:Math.round(correct/N*1000)/100, auto, responses:{...exam.picks}});
+  view='result'; render(); window.scrollTo(0,0);
+}
+app.addEventListener('click', e=>{
+  const b = e.target.closest('[data-act]'); if(!b || b.disabled) return;
+  const a = b.dataset.act;
+  if(a==='noop'){ e.preventDefault(); return; }
+  let scroll = false;
+  if(a==='home'||a==='history'||a==='study'||a==='examStart'){ view=a; navOpen=false; scroll=true; }
+  else if(a==='toggleNav'){ navOpen=!navOpen; }
+  else if(a==='pick'){ studyPick(b.dataset.k); }
+  else if(a==='prev'){ study.i=Math.max(0,study.i-1); scroll=true; }
+  else if(a==='next'){ study.i=Math.min(N-1,study.i+1); scroll=true; }
+  else if(a==='go'){ study.i=+b.dataset.i; navOpen=false; scroll=true; }
+  else if(a==='resetStudy'||a==='newRound'){ study={i:0,picks:{},recorded:false,k:null}; scroll=true; }
+  else if(a==='review'){ startReview(+b.dataset.k); scroll=true; }
+  else if(a==='rpick'){ reviewPick(b.dataset.k); }
+  else if(a==='rprev'){ review.i=Math.max(0,review.i-1); scroll=true; }
+  else if(a==='rnext'){ review.i=Math.min(review.items.length-1,review.i+1); scroll=true; }
+  else if(a==='rgo'){ review.i=+b.dataset.i; navOpen=false; scroll=true; }
+  else if(a==='epick'){ const n=EXAM.questions[exam.order[exam.i]].n; exam.picks[n]=b.dataset.k; }
+  else if(a==='eprev'){ exam.i=Math.max(0,exam.i-1); scroll=true; }
+  else if(a==='enext'){ exam.i=Math.min(N-1,exam.i+1); scroll=true; }
+  else if(a==='ego'){ exam.i=+b.dataset.i; navOpen=false; scroll=true; }
+  else if(a==='nextBlank'){ const j=nextBlank(); if(j>=0){ exam.i=j; scroll=true; } }
+  else if(a==='flag'){ const n=EXAM.questions[exam.order[exam.i]].n; exam.flags.has(n)?exam.flags.delete(n):exam.flags.add(n); }
+  else if(a==='askSubmit'){ exam.confirm=true; }
+  else if(a==='cancelSubmit'){ exam.confirm=false; }
+  else if(a==='submit'){ submit(false); return; }
+  render();
+  if(scroll) window.scrollTo(0,0);
+  if(a==='askSubmit') document.querySelector('.confirm')?.scrollIntoView({block:'center'});
+});
+document.addEventListener('keydown', e=>{
+  if(e.target.closest('input,textarea')) return;
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  const k = e.key.length===1 ? e.key.toUpperCase() : '';
+  const isLetter = k && 'ABCD'.includes(k);
+  if(view==='study'){
+    if(isLetter){ studyPick(k); render(); }
+    else if(e.key==='ArrowRight' && study.i<N-1){ study.i++; render(); }
+    else if(e.key==='ArrowLeft' && study.i>0){ study.i--; render(); }
+  } else if(view==='review'){
+    if(isLetter){ reviewPick(k); render(); }
+    else if(e.key==='ArrowRight' && review.i<review.items.length-1){ review.i++; render(); }
+    else if(e.key==='ArrowLeft' && review.i>0){ review.i--; render(); }
+  } else if(view==='exam'){
+    if(isLetter && !exam.confirm){ exam.picks[EXAM.questions[exam.order[exam.i]].n]=k; render(); }
+    else if(e.key==='ArrowRight' && exam.i<N-1){ exam.i++; render(); }
+    else if(e.key==='ArrowLeft' && exam.i>0){ exam.i--; render(); }
+  }
+});
+render();
+</script>
