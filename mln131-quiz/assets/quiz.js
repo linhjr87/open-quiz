@@ -1,7 +1,7 @@
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
   loadState, saveState, formatTime, shuffled, storageKey, formatVotes,
-  loadHistory, wrongOf, historyStats, formatDate, makeAttempt, appendAttempt,
+  loadHistory, wrongOf, historyStats, formatDate, makeAttempt, appendAttempt, expireIfIdle,
 } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
@@ -631,6 +631,7 @@ function notFound(msg) {
     <main class="wrap"><div class="notice"><h1>${esc(msg)}</h1><p>Đề này không có trong danh sách hoặc không tải được.</p><a class="btn primary" href="index.html">${ic('back')}Về trang chủ</a></div></main>${quizFoot()}`;
 }
 async function main() {
+  expireIfIdle(Date.now());
   let manifest;
   try {
     const res = await fetch('data/index.json');
