@@ -1,0 +1,61 @@
+{
+  "id": "TEST-FE",
+  "subject": "MLN131",
+  "term": "TEST",
+  "code": "FE",
+  "title": "MLN131 · TEST · FE",
+  "source": null,
+  "questions": [
+    {
+      "n": 1,
+      "text": "Chủ nghĩa xã hội khoa học là một trong ba bộ phận cấu thành chủ nghĩa Mác - Lênin. Chọn đáp án đúng về đối tượng nghiên cứu của nó.",
+      "options": {
+        "A": "Những quy luật chung của sự vận động của tự nhiên, xã hội và tư duy",
+        "B": "Những quy luật, tính quy luật chính trị - xã hội của quá trình phát sinh, hình thành và phát triển hình thái kinh tế - xã hội cộng sản chủ nghĩa",
+        "C": "Quy luật giá trị thặng dư trong nền sản xuất tư bản chủ nghĩa",
+        "D": "Những quy luật vận động của nền kinh tế thị trường"
+      },
+      "pick": 1,
+      "answer": ["B"],
+      "aiAnswer": ["B"],
+      "commentAnswer": ["B"],
+      "commentVotes": { "B": 2 },
+      "status": "verified",
+      "ocrNote": null
+    },
+    {
+      "n": 2,
+      "text": "Giai cấp công nhân có sứ mệnh lịch sử toàn thế giới là gì?",
+      "options": {
+        "A": "Xóa bỏ chế độ tư bản chủ nghĩa, xây dựng xã hội xã hội chủ nghĩa và cộng sản chủ nghĩa",
+        "B": "Duy trì chế độ tư hữu về tư liệu sản xuất",
+        "C": "Giữ nguyên các quan hệ giai cấp hiện có",
+        "D": "Thúc đẩy chủ nghĩa dân tộc cực đoan"
+      },
+      "pick": 1,
+      "answer": ["A"],
+      "aiAnswer": ["A"],
+      "commentAnswer": ["C"],
+      "commentVotes": { "C": 1 },
+      "status": "disputed",
+      "ocrNote": "Chữ ở phương án C hơi mờ, đã đọc lại ở lượt 2."
+    },
+    {
+      "n": 3,
+      "text": "Dân chủ xã hội chủ nghĩa có bản chất như thế nào?",
+      "options": {
+        "A": "Mang bản chất của giai cấp công nhân, đồng thời có tính nhân dân và tính dân tộc sâu sắc",
+        "B": "Chỉ mang bản chất của giai cấp tư sản",
+        "C": "Không mang bản chất giai cấp nào",
+        "D": "Chỉ là hình thức, không có nội dung thực tế"
+      },
+      "pick": 1,
+      "answer": ["A"],
+      "aiAnswer": ["A"],
+      "commentAnswer": null,
+      "commentVotes": null,
+      "status": "ai-only",
+      "ocrNote": null
+    }
+  ]
+}
