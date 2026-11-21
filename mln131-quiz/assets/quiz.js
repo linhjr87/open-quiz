@@ -148,11 +148,18 @@ function loadStudy() {
   const raw = loadState(storageKey(DATA.id, 'study'), null);
   const obj = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   const i = Number.isInteger(obj.i) && obj.i >= 0 && obj.i < N ? obj.i : 0;
-  return { i, responses: sanitizeResponses(QS, obj.responses), draft: [] };
+  const responses = sanitizeResponses(QS, obj.responses);
+  const st = { i, responses, draft: [], confirmReset: false };
+  // `recorded` = history number of this round; only meaningful while the round is complete.
+  if (Number.isInteger(obj.recorded) && obj.recorded >= 1 && Object.keys(responses).length === N) st.recorded = obj.recorded;
+  return st;
 }
 function saveStudy() {
-  saveState(storageKey(DATA.id, 'study'), { i: study.i, responses: study.responses });
+  const out = { i: study.i, responses: study.responses };
+  if (study.recorded) out.recorded = study.recorded;
+  saveState(storageKey(DATA.id, 'study'), out);
 }
+const freshStudy = () => ({ i: 0, responses: {}, draft: [], confirmReset: false });
 function loadExam() {
   const raw = loadState(storageKey(DATA.id, 'exam'), null);
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
@@ -190,6 +197,13 @@ function renderStudy() {
   const resetConfirm = study.confirmReset ? `<div class="confirm" role="alert"><p><b>Làm lại từ đầu?</b> ${done ? `Toàn bộ ${done} câu đã làm sẽ bị xoá.` : 'Tiến độ sẽ được đặt lại.'}</p>
      <div class="acts"><button class="btn primary" data-act="doResetStudy">Làm lại</button><button class="btn" data-act="cancelReset">Huỷ</button></div></div>` : '';
   const correct = QS.filter((x) => study.responses[x.n] && isCorrect(x, study.responses[x.n])).length;
+  const complete = !!study.recorded && done === N;
+  const wrongN = N - correct;
+  const card = complete ? doneCard({
+    eyebrow: `Hoàn thành lượt ôn · lần #${study.recorded}`, ok: correct, total: N, note: 'câu đúng · đã lưu vào lịch sử',
+    acts: (wrongN ? `<a class="btn primary" href="${modeUrl('review', `&amp;attempt=${study.recorded}`)}">${ic('target')}Ôn ${wrongN} câu sai</a>` : '') +
+      `<button class="btn${wrongN ? '' : ' primary'}" data-act="newRound">${ic('reset')}Lượt mới</button><a class="btn ghost" href="${modeUrl('history')}">${ic('history')}Xem lịch sử</a>`,
+  }) : '';
   const cells = QS.map((x, i) => {
     const r = study.responses[x.n];
     let c = 'cell';
@@ -201,13 +215,13 @@ function renderStudy() {
   `<div class="progress"><i style="width:${(done / N) * 100}%"></i></div>` +
   layout({
     label: `Câu ${esc(q.n)}/${N} · đúng ${correct}/${done}`,
-    html: `<div class="panel-head"><b>Đúng ${correct}/${done} câu đã làm</b><button class="btn ghost" data-act="resetStudy">${ic('reset')}Làm lại</button></div>
-      ${resetConfirm}
+    html: `<div class="panel-head"><b>${complete ? `Hoàn thành · đúng ${correct}/${N}` : `Đúng ${correct}/${done} câu đã làm`}</b>${complete ? '' : `<button class="btn ghost" data-act="resetStudy">${ic('reset')}Làm lại</button>`}</div>
+      ${complete ? '' : resetConfirm}
       <div class="grid">${cells}</div>
       <div class="keys"><span><i class="sw" style="background:var(--ok-weak);border-color:var(--ok)"></i>Đúng</span><span><i class="sw" style="background:var(--bad-weak);border-color:var(--bad);border-style:dashed"></i>Sai</span><span><i class="sw"></i>Chưa làm</span></div>`,
-  }, `
+  }, `${card}
     <article class="q">
-      <div class="q-head"><span class="q-num">Câu ${esc(q.n)}/${N}</span><span class="q-hint">${hintStudy(q)}</span></div>
+      <div class="q-head"><span class="q-num">Câu ${esc(q.n)}/${N}</span><span class="q-hint">${complete ? 'Xem lại đáp án' : hintStudy(q)}</span></div>
       <p class="q-text">${esc(q.text)}</p>
       <div class="opts">${opts}</div>${after}
     </article>
@@ -232,6 +246,16 @@ function focusAfterAnswer(q) {
 }
 function studyCheck() {
   if (roundCheck(study, QS[study.i])) saveStudy();
+}
+// Once every question has an answer, write one history entry for the round
+// and show the completion card. Call after focusAfterAnswer so the card wins focus.
+function maybeRecordStudy() {
+  if (study.recorded || Object.keys(study.responses).length !== N) return;
+  study.recorded = appendAttempt(DATA.id, makeAttempt('study', QS, study.responses, Date.now()));
+  HIST = loadHistory(DATA.id);
+  saveStudy();
+  focusNext = '#doneCard';
+  scrollTop = true;
 }
 
 /* ---------- history ---------- */
@@ -535,15 +559,16 @@ app.addEventListener('click', (e) => {
   const a = b.dataset.act;
   let scroll = false;
   if (a === 'examStart') { view = 'examStart'; scroll = true; }
-  else if (a === 'pick') { studyPick(b.dataset.k); focusAfterAnswer(QS[study.i]); }
-  else if (a === 'check') { studyCheck(); focusAfterAnswer(QS[study.i]); }
+  else if (a === 'pick') { studyPick(b.dataset.k); focusAfterAnswer(QS[study.i]); maybeRecordStudy(); }
+  else if (a === 'check') { studyCheck(); focusAfterAnswer(QS[study.i]); maybeRecordStudy(); }
   else if (a === 'prev') { studyGo(study.i - 1); scroll = true; }
   else if (a === 'next') { studyGo(study.i + 1); scroll = true; }
   else if (a === 'go') { studyGo(+b.dataset.i); navOpen = false; scroll = true; }
   else if (a === 'toggleNav') navOpen = !navOpen;
   else if (a === 'resetStudy') { study.confirmReset = true; focusNext = '[data-act="cancelReset"]'; }
   else if (a === 'cancelReset') { study.confirmReset = false; focusNext = '[data-act="resetStudy"]'; }
-  else if (a === 'doResetStudy') { study = { i: 0, responses: {}, draft: [], confirmReset: false }; saveStudy(); focusNext = '[data-act="resetStudy"]'; scroll = true; }
+  else if (a === 'doResetStudy') { study = freshStudy(); saveStudy(); focusNext = '[data-act="resetStudy"]'; scroll = true; }
+  else if (a === 'newRound') { study = freshStudy(); saveStudy(); navOpen = false; focusNext = '.opt'; scroll = true; }
   else if (a === 'rpick') reviewAfterAnswer(roundPick(review, reviewQ(), b.dataset.k));
   else if (a === 'rcheck') reviewAfterAnswer(roundCheck(review, reviewQ()));
   else if (a === 'rprev') { reviewGo(review.i - 1); scroll = true; }
@@ -580,8 +605,8 @@ document.addEventListener('keydown', (e) => {
   const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
   if (view === 'study') {
     const q = QS[study.i];
-    if (k.length === 1 && letters(q).includes(k)) { studyPick(k); focusAfterAnswer(q); render(); }
-    else if (e.key === 'Enter' && pickOf(q) > 1 && !study.responses[q.n] && study.draft.length === pickOf(q) && e.target === document.body) { studyCheck(); focusAfterAnswer(q); render(); }
+    if (k.length === 1 && letters(q).includes(k)) { studyPick(k); focusAfterAnswer(q); maybeRecordStudy(); render(); }
+    else if (e.key === 'Enter' && pickOf(q) > 1 && !study.responses[q.n] && study.draft.length === pickOf(q) && e.target === document.body) { studyCheck(); focusAfterAnswer(q); maybeRecordStudy(); render(); }
     else if (e.key === 'ArrowRight' && study.i < N - 1) { studyGo(study.i + 1); render(); }
     else if (e.key === 'ArrowLeft' && study.i > 0) { studyGo(study.i - 1); render(); }
   } else if (view === 'review' && review) {
