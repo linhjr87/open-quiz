@@ -218,7 +218,7 @@ git commit -m "core: attempt history, wrong-question recompute, 7-day idle reset
   - topbar có back về Lịch sử
   - ô lưới ghi số câu đề gốc, `aria-label="Câu <n> đề gốc, vẫn sai"` khi trả lời sai
   - `.side-meta` và `.side-note`
-  - `.prev-pick` dạng "Lần #k: bạn chọn **B**", hoặc "bỏ trống"
+  - không hiện lại đáp án đã chọn ở lần trước (không có `.prev-pick`); sau khi chọn chỉ hiện như Ôn tập
   - nhãn nút thu gọn trên mobile `Câu sai i/Y · đúng x/done`
   - khi làm hết: `doneCard` "XONG ÔN CÂU SAI · LẦN #k" với hai nút [Ôn lại] (primary) và [Về lịch sử]
 - Cách chọn đáp án giống Ôn tập: một đáp án thì khoá ngay, nhiều đáp án thì có nút Kiểm tra. Bàn phím: A–D, Enter, ←/→.

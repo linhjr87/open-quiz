@@ -227,7 +227,6 @@ h1{font-size:clamp(28px,6vw,40px);line-height:1.15;letter-spacing:-.025em;margin
 .done-card .big{font-size:44px}
 .done-card .meter{margin:12px 0 14px}
 .done-card .acts{display:flex;gap:8px;flex-wrap:wrap}
-.prev-pick{font-size:13px;color:var(--muted)}
 .side-meta{display:flex;align-items:center;gap:8px;margin:-4px 0 10px}
 .side-note{font-size:12px;color:var(--muted);margin:10px 0 0;line-height:1.5}
 .submit-hint{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font-size:14px;padding:8px 8px 8px 14px;border-radius:var(--r);background:var(--sunken);color:var(--muted)}
@@ -529,8 +528,7 @@ function renderReview(){
   const picked = review.picks[q.n];
   const done = Object.keys(review.picks).length;
   const correct = EXAM.questions.filter(x=>review.picks[x.n] && review.picks[x.n]===x.answer).length;
-  const before = a.responses[q.n];
-  const after = picked ? `<div class="after">${verdict(q,picked)}<span class="prev-pick">Lần #${review.k}: ${before?`bạn chọn <b class="mono">${before}</b>`:'bỏ trống'}</span>${badge(q)}${reportLink(q)}</div>` : '';
+  const after = picked ? `<div class="after">${verdict(q,picked)}${badge(q)}${reportLink(q)}</div>` : '';
   const cells = review.items.map((qi,i)=>{
     const x=EXAM.questions[qi], p=review.picks[x.n]; let c='cell';
     if(p) c+= p===x.answer?' right':' wrong';

@@ -66,7 +66,7 @@ Dùng `layout()` như Ôn tập. Khác biệt:
   - ghi chú `.side-note`: "Số trên ô là số câu trong đề gốc. Lượt ôn này không lưu tiến độ và không tính vào lịch sử."
 - Nhãn nút thu gọn trên mobile: `Câu sai i/Y · đúng x/done`.
 - Đầu câu: `Câu 12` cùng hint "đề gốc · câu sai 3/18 · phím A–D".
-- Sau khi chọn, cạnh verdict có thêm `.prev-pick` màu muted: "Lần #k: bạn chọn **B**" (hoặc "bỏ trống").
+- Sau khi chọn chỉ hiện như Ôn tập: verdict, badge và Báo lỗi. **Không** hiện lại đáp án đã chọn ở lần trước (chủ dự án yêu cầu).
 - Làm hết thì hiện thẻ hoàn thành ở đầu cột phải: "XONG ÔN CÂU SAI · LẦN #k", `X/Y câu đúng · lượt này không lưu vào lịch sử`, hai nút [⟲ Ôn lại] (primary) và [Về lịch sử].
 - `attempt` không hợp lệ: dùng `.notice` "Không tìm thấy lần làm này" kèm nút về Lịch sử.
 
@@ -86,7 +86,7 @@ Dùng `layout()` như Ôn tập. Khác biệt:
 
 ## 8. CSS cần thêm
 
-Lấy nguyên khối `/* history, completion card, review */` ở cuối `<style>` trong `design/prototype-lich-su.html`. Khối này gồm các class `.chip`, `.c-exam`, `.c-study`, `.hist-sum`, `.tile`, `.hrow`, `.hnum`, `.mini`, `.allok`, `.done-card`, `.prev-pick`, `.side-meta`, `.side-note`, `.submit-hint`, `.hist-btn` và media query ≤ 480px. Các giá trị đều dùng token có sẵn.
+Lấy nguyên khối `/* history, completion card, review */` ở cuối `<style>` trong `design/prototype-lich-su.html`. Khối này gồm các class `.chip`, `.c-exam`, `.c-study`, `.hist-sum`, `.tile`, `.hrow`, `.hnum`, `.mini`, `.allok`, `.done-card`, `.side-meta`, `.side-note`, `.submit-hint`, `.hist-btn` và media query ≤ 480px. Các giá trị đều dùng token có sẵn.
 
 ## 9. Kiểm tra trước khi xong
 
