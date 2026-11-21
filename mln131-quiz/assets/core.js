@@ -9,6 +9,7 @@ export function resolveExamId(search, manifest) {
 
 export function isCorrect(q, picked) {
   if (!Array.isArray(picked)) return false;
+  if (!Array.isArray(q.answer) || q.answer.length === 0) return false;
   const want = new Set(q.answer);
   const got = new Set(picked);
   if (want.size !== got.size) return false;
@@ -34,7 +35,8 @@ export function sanitizeResponses(questions, raw) {
   for (const q of questions) {
     const v = raw[q.n];
     if (!Array.isArray(v)) continue;
-    const letters = v.filter((l) => typeof l === 'string' && Object.hasOwn(q.options, l));
+    const options = q.options || {};
+    const letters = v.filter((l) => typeof l === 'string' && Object.hasOwn(options, l));
     if (letters.length) out[q.n] = [...new Set(letters)];
   }
   return out;
@@ -59,7 +61,8 @@ export function saveState(key, value) {
 }
 
 export function formatTime(sec) {
-  const s = Math.max(0, Math.floor(Number(sec) || 0));
+  const n = Number(sec);
+  const s = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
   const mm = String(Math.floor(s / 60)).padStart(2, '0');
   const ss = String(s % 60).padStart(2, '0');
   return `${mm}:${ss}`;

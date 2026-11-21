@@ -112,3 +112,20 @@ test('shuffled is deterministic, non-mutating, a permutation', () => {
 test('storageKey', () => {
   assert.equal(storageKey('FA24-FE', 'exam'), 'mln131:FA24-FE:exam');
 });
+
+test('isCorrect is false when the question has an empty or missing answer', () => {
+  assert.equal(isCorrect({ n: 1, answer: [] }, []), false);
+  assert.equal(isCorrect({ n: 1, answer: [] }, ['A']), false);
+  assert.equal(isCorrect({ n: 1 }, ['A']), false);
+});
+
+test('sanitizeResponses treats missing options as empty', () => {
+  assert.deepEqual(sanitizeResponses([{ n: 1 }], { 1: ['A'] }), {});
+});
+
+test('formatTime returns 00:00 for non-finite input', () => {
+  assert.equal(formatTime(NaN), '00:00');
+  assert.equal(formatTime(Infinity), '00:00');
+  assert.equal(formatTime(-Infinity), '00:00');
+  assert.equal(formatTime(undefined), '00:00');
+});
