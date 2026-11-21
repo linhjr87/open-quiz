@@ -59,7 +59,7 @@ Dữ liệu nằm trong `data/<id>.json` (id có dạng `<KỲ>-<MÃ>`, ví dụ
    # đề còn đang làm dở (chưa có đáp án): thêm --draft
    ```
 
-   Validator kiểm tra số câu, phương án không rỗng, `answer` nằm trong `options`, `len(answer) == pick`, `status` hợp lệ và manifest khớp dữ liệu. Nó thoát với mã 1 nếu có lỗi. CI chạy bản không `--draft`, nên chỉ đề đã có đủ đáp án mới được đưa vào `data/`.
+   Validator kiểm tra số câu, phương án không rỗng, `answer` nằm trong `options`, `len(answer) == pick`, `status` hợp lệ và manifest khớp dữ liệu. Nó thoát với mã 1 nếu có lỗi. CI chạy bản không `--draft`, nên chỉ đề đã có đủ đáp án mới được đưa vào `data/`. CI cũng chạy `--check-manifest`: **luôn chạy `python -I tools/build_manifest.py` trước khi commit** (mỗi lần thêm hoặc sửa đề), nếu không `data/index.json` lệch dữ liệu và CI sẽ báo đỏ.
 
 ## Chạy kiểm thử
 

@@ -38,7 +38,7 @@ jobs:
         run: python -I -m unittest discover -s tools
 
       - name: Validate exam data
-        run: python -I tools/validate.py data/
+        run: python -I tools/validate.py --check-manifest data/
 
       - uses: actions/configure-pages@v5
 
