@@ -53,7 +53,7 @@ Question schema: `n`, `text`, `options` (letter → text), `pick` (how many answ
 
 - `core.js` holds the pure logic (scoring, `isCorrect`, response sanitizing, seeded `shuffled` via mulberry32, and `localStorage` wrappers keyed `mln131:<examId>:<mode>`). It is the only module with unit tests, so put testable logic here rather than in the page scripts.
 - `home.js` (`index.html`) lists the exams from `data/index.json` and shows saved progress.
-- `quiz.js` (`quiz.html?id=<examId>&mode=exam|study`) is a single view state machine (`study | examStart | exam | result`). **Thi thử** (exam) mode has a countdown and shows answers only after submitting, scored out of 10. **Ôn tập** (study) mode gives instant feedback. The "Báo lỗi" button opens a prefilled GitHub issue on `linhjr87/open-quiz`.
+- `quiz.js` (`quiz.html?exam=<examId>&mode=study|exam|history|review`, plus `attempt=<k>` for review) is a single view state machine (`study | examStart | exam | result | history | review`). **Thi thử** (exam) mode has a countdown and shows answers only after submitting, scored out of 10. **Ôn tập** (study) mode gives instant feedback. `mode=history` lists past attempts of the exam, and `mode=review&attempt=<k>` reviews attempt k (1-based). Attempts are stored under `mln131:<id>:history` (helpers `loadHistory`, `appendAttempt`, `historyStats` in `core.js`). Both pages call `expireIfIdle(Date.now())` first in `main()`: if `mln131:lastSeen` is older than 7 days, every `mln131:*` key is wiped. The "Báo lỗi" button opens a prefilled GitHub issue on `linhjr87/open-quiz`.
 - `icons.js` holds the SVG icons and the `esc` HTML-escaping helper. Escape all question text through `esc`.
 - `design/prototype.html` is the UI prototype. The spec and plan are in `docs/superpowers/`.
 

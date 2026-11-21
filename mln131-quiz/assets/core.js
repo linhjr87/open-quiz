@@ -102,3 +102,123 @@ export function shuffled(arr, seed) {
 export function storageKey(examId, mode) {
   return `mln131:${examId}:${mode}`;
 }
+
+// ---- Lịch sử làm bài ----
+
+export const IDLE_RESET_MS = 604800000; // 7 ngày
+
+const LAST_SEEN_KEY = 'mln131:lastSeen';
+
+const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+
+// Xoá toàn bộ khoá `mln131:*` nếu đã quá 7 ngày không mở trang, rồi ghi lại lastSeen.
+// Trả true nếu đã xoá. Mọi lỗi storage bị nuốt (trả false).
+export function expireIfIdle(now, storage) {
+  try {
+    const st = storage === undefined ? globalThis.localStorage : storage;
+    let last = null;
+    const raw = st.getItem(LAST_SEEN_KEY);
+    if (raw !== null && raw !== undefined) {
+      try { last = JSON.parse(raw); } catch { last = null; } // hỏng: coi như chưa có, ghi lại bên dưới
+    }
+    let wiped = false;
+    if (typeof last === 'number' && Number.isFinite(last) && now - last > IDLE_RESET_MS) {
+      const keys = [];
+      for (let i = 0; i < st.length; i++) {
+        const k = st.key(i);
+        if (typeof k === 'string' && k.startsWith('mln131:')) keys.push(k);
+      }
+      for (const k of keys) st.removeItem(k);
+      wiped = true;
+    }
+    st.setItem(LAST_SEEN_KEY, JSON.stringify(now));
+    return wiped;
+  } catch {
+    return false;
+  }
+}
+
+function validAttempt(a) {
+  if (!isPlainObject(a)) return false;
+  if (a.mode !== 'study' && a.mode !== 'exam') return false;
+  if (typeof a.at !== 'number' || !Number.isFinite(a.at)) return false;
+  if (!Number.isInteger(a.total) || a.total <= 0) return false;
+  if (!Number.isInteger(a.correct) || a.correct < 0 || a.correct > a.total) return false;
+  if (!isPlainObject(a.responses)) return false;
+  if (a.mode === 'exam' && !(typeof a.score10 === 'number' && Number.isFinite(a.score10))) return false;
+  return true;
+}
+
+export function sanitizeHistory(raw) {
+  const attempts = isPlainObject(raw) && Array.isArray(raw.attempts) ? raw.attempts.filter(validAttempt) : [];
+  return { v: 1, attempts };
+}
+
+export function loadHistory(examId) {
+  return sanitizeHistory(loadState(storageKey(examId, 'history'), null));
+}
+
+// Trả k (1-based) của lần làm mới = độ dài mới của attempts.
+export function appendAttempt(examId, attempt) {
+  const h = loadHistory(examId);
+  h.attempts.push(attempt);
+  saveState(storageKey(examId, 'history'), h);
+  return h.attempts.length;
+}
+
+export function makeAttempt(mode, questions, responses, now, auto = false) {
+  const { correct, total, score10 } = scoreExam(questions, responses);
+  const copy = {};
+  for (const [n, v] of Object.entries(responses || {})) if (Array.isArray(v)) copy[n] = [...v];
+  const attempt = { mode, at: now, correct, total };
+  if (mode === 'exam') attempt.score10 = score10;
+  if (auto) attempt.auto = true;
+  attempt.responses = copy;
+  return attempt;
+}
+
+// Số câu sai (theo đáp án hiện tại), theo thứ tự `questions`; câu bỏ trống tính là sai.
+export function wrongOf(attempt, questions) {
+  const responses = (attempt && attempt.responses) || {};
+  return questions.filter((q) => !isCorrect(q, responses[q.n] || [])).map((q) => q.n);
+}
+
+export function historyStats(history) {
+  let exams = 0;
+  let studies = 0;
+  let best = null;
+  for (const a of (history && history.attempts) || []) {
+    if (a.mode === 'exam') {
+      exams++;
+      if (typeof a.score10 === 'number' && (best === null || a.score10 > best)) best = a.score10;
+    } else if (a.mode === 'study') studies++;
+  }
+  return { exams, studies, best };
+}
+
+// Điểm cao nhất của một đề: khoá cũ `best` (trước khi có lịch sử) gộp với điểm thi thử cao nhất
+// trong lịch sử. null khi chưa có điểm nào.
+export function bestOf(examId, history) {
+  const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
+  const legacy = loadState(storageKey(examId, 'best'), null);
+  const hist = historyStats(history).best;
+  const vals = [legacy, hist].filter(isNum);
+  return vals.length ? Math.max(...vals) : null;
+}
+
+export function formatDate(ms) {
+  const d = new Date(ms);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
+
+// Keyboard answer: a letter key (any case) or a digit 1..n picks the n-th option.
+// Returns the option letter, or null when the key does not map to an option.
+export function keyToLetter(key, letters) {
+  if (typeof key !== 'string' || key.length !== 1) return null;
+  const up = key.toUpperCase();
+  if (letters.includes(up)) return up;
+  if (up >= '1' && up <= '9') return letters[Number(up) - 1] ?? null;
+  return null;
+}

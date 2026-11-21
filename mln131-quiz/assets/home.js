@@ -1,13 +1,8 @@
-import { loadState, storageKey } from './core.js';
+import { expireIfIdle, loadHistory, historyStats, bestOf } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
 const app = document.getElementById('app');
 const ISSUES_URL = 'https://github.com/linhjr87/open-quiz/issues';
-
-function bestScore(id) {
-  const v = loadState(storageKey(id, 'best'), null);
-  return typeof v === 'number' && Number.isFinite(v) ? v : null;
-}
 
 function header() {
   return `<header class="bar"><div class="wrap"><div class="brand">${drumSvg(26, 'star', true)}<span class="mark">MLN131</span>Phòng thi thử</div></div></header>`;
@@ -33,13 +28,22 @@ function hero(total) {
 function row(e) {
   const href = (mode) => `quiz.html?exam=${encodeURIComponent(e.id)}&amp;mode=${mode}`;
   const disputed = Number(e.stats && e.stats.disputed) || 0;
-  const best = bestScore(e.id);
+  const history = loadHistory(e.id);
+  const st = historyStats(history);
+  const best = bestOf(e.id, history);
   const code = e.term && e.code ? `${e.term} · ${e.code}` : e.title || e.id;
   const subs = [`<span>${Number(e.count) || 0} câu</span>`];
   if (disputed) subs.push(`<span>${ic('warn', 'style="width:14px;height:14px;vertical-align:-2px;color:var(--warn)"')} ${disputed} câu tranh cãi</span>`);
-  subs.push(best === null ? '<span>Chưa thi thử</span>' : `<span>Cao nhất <b class="mono">${best.toFixed(2)}</b></span>`);
+  const bestHtml = best === null ? '' : `<span>Cao nhất <b class="mono">${best.toFixed(2)}</b></span>`;
+  if (st.exams > 0) subs.push(`<span>Thi thử ${st.exams} lần</span>`);
+  if (best !== null) subs.push(bestHtml);
+  else if (st.exams === 0) subs.push('<span>Chưa thi thử</span>');
+  if (st.studies > 0) subs.push(`<span>Ôn tập ${st.studies} lần</span>`);
+  const hist = history.attempts.length > 0
+    ? `<a class="btn hist-btn" href="${href('history')}" aria-label="Lịch sử làm bài">${ic('history')}<span class="lbl">Lịch sử</span></a>`
+    : '';
   return `<div class="row"><div class="meta"><div class="code">${esc(code)}</div><div class="sub">${subs.join('')}</div></div>
-    <div class="acts">
+    <div class="acts">${hist}
       <a class="btn" href="${href('study')}">${ic('book')}Ôn tập</a>
       <a class="btn primary" href="${href('exam')}">${ic('clock')}Thi thử</a>
     </div></div>`;
@@ -64,6 +68,7 @@ function render(manifest) {
 }
 
 async function main() {
+  expireIfIdle(Date.now());
   try {
     const res = await fetch('data/index.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
