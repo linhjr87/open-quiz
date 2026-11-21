@@ -116,7 +116,7 @@ function renderStudy() {
   for (const k of letters(q)) {
     let cls = 'opt', s = '', pressed = '';
     if (locked) {
-      if (q.answer.includes(k)) { cls += ' right'; s = ic('check'); }
+      if ((q.answer || []).includes(k)) { cls += ' right'; s = ic('check'); }
       else if (locked.includes(k)) { cls += ' wrong'; s = ic('x'); }
       else cls += ' dim';
     } else if (multi) {
@@ -129,7 +129,7 @@ function renderStudy() {
   if (locked) {
     const ok = isCorrect(q, locked);
     after = `<div class="after">
-      <span class="verdict ${ok ? 'ok' : 'bad'}">${ok ? `${ic('check')}Chính xác` : `${ic('x')}Chưa đúng · đáp án ${esc(q.answer.join(', '))}`}</span>
+      <span class="verdict ${ok ? 'ok' : 'bad'}">${ok ? `${ic('check')}Chính xác` : `${ic('x')}Chưa đúng · đáp án ${esc((q.answer || []).join(', '))}`}</span>
       ${badge(q)}${reportLink(q)}</div>`;
   } else if (multi) {
     after = `<div class="after"><button class="btn primary" data-act="check" ${study.draft.length === p ? '' : 'disabled'}>${ic('check')}Kiểm tra</button><span class="q-hint">Đã chọn ${study.draft.length}/${p}</span>${reportLink(q)}</div>`;
@@ -143,13 +143,13 @@ function renderStudy() {
     let c = 'cell';
     if (r) c += isCorrect(x, r) ? ' right' : ' wrong';
     if (i === study.i) c += ' cur';
-    return `<button class="${c}" data-act="go" data-i="${i}" aria-label="Câu ${x.n}${r ? (isCorrect(x, r) ? ', đúng' : ', sai') : ''}"${i === study.i ? ' aria-current="true"' : ''}>${x.n}</button>`;
+    return `<button class="${c}" data-act="go" data-i="${i}" aria-label="Câu ${esc(x.n)}${r ? (isCorrect(x, r) ? ', đúng' : ', sai') : ''}"${i === study.i ? ' aria-current="true"' : ''}>${esc(x.n)}</button>`;
   }).join('');
   return topbar(examTitle(), 'Ôn tập', `<span class="mono" style="font-size:14px;color:var(--muted)">${done}/${N}</span>`) +
   `<div class="progress"><i style="width:${(done / N) * 100}%"></i></div>
   <main class="wrap">
     <article class="q">
-      <div class="q-head"><span class="q-num">Câu ${q.n}/${N}</span><span class="q-hint">${hintStudy(q)}</span></div>
+      <div class="q-head"><span class="q-num">Câu ${esc(q.n)}/${N}</span><span class="q-hint">${hintStudy(q)}</span></div>
       <p class="q-text">${esc(q.text)}</p>
       <div class="opts">${opts}</div>${after}
     </article>
@@ -222,7 +222,7 @@ function renderExam() {
   `<div class="progress"><i style="width:${(answered / N) * 100}%"></i></div>
   <main class="wrap">
     <article class="q">
-      <div class="q-head"><span class="q-num">Câu ${exam.i + 1}/${N}</span><span class="q-hint">(Choose ${p} answer${p > 1 ? 's' : ''})</span><span class="spacer"></span>
+      <div class="q-head"><span class="q-num">Câu ${exam.i + 1}/${N}</span><span class="q-hint">(Choose ${p} answer${p > 1 ? 's' : ''}) · Chọn ${p} đáp án · phím ${esc(letters(q)[0] || 'A')}–${esc(letters(q)[letters(q).length - 1] || 'D')}</span><span class="spacer"></span>
         <button class="btn flagbtn${exam.flags.has(q.n) ? ' on' : ''}" data-act="flag" aria-pressed="${exam.flags.has(q.n)}">${ic('flag')}Xem lại</button></div>
       <p class="q-text">${esc(q.text)}</p>
       <div class="opts">${opts}</div>
@@ -289,10 +289,10 @@ function renderResult() {
   const wrongFilled = wrong.length - blank;
   const items = wrong.map((q) => {
     const p = exam.responses[q.n];
-    return `<div class="wl"><span class="q-num">Câu ${q.n}</span><p class="qt">${esc(q.text)}</p>
+    return `<div class="wl"><span class="q-num">Câu ${esc(q.n)}</span><p class="qt">${esc(q.text)}</p>
       <div class="ans">
         <div><span class="tag">Bạn chọn</span><span class="yours">${p ? answerLines(q, p) : 'Bỏ trống'}</span></div>
-        <div><span class="tag">Đáp án</span><span class="key">${answerLines(q, q.answer)}</span></div>
+        <div><span class="tag">Đáp án</span><span class="key">${answerLines(q, q.answer || [])}</span></div>
       </div><div class="after" style="margin-top:10px">${badge(q)}${reportLink(q)}</div></div>`;
   }).join('');
   return topbar(examTitle(), 'Kết quả thi thử') + `<main class="wrap">
@@ -366,6 +366,7 @@ app.addEventListener('click', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.target.closest && e.target.closest('input,textarea')) return;
   if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (!DATA || !QS.length) return; // data not loaded, or exam not found
   const k = e.key.length === 1 ? e.key.toUpperCase() : e.key;
   if (view === 'study') {
     const q = QS[study.i];
@@ -375,7 +376,7 @@ document.addEventListener('keydown', (e) => {
     else if (e.key === 'ArrowLeft' && study.i > 0) { studyGo(study.i - 1); render(); }
   } else if (view === 'exam') {
     const q = QS[exam.order[exam.i]];
-    if (k.length === 1 && letters(q).includes(k)) { examPick(k); render(); }
+    if (k.length === 1 && letters(q).includes(k)) { if (!exam.confirm) { examPick(k); render(); } }
     else if (e.key === 'ArrowRight' && exam.i < N - 1) { examGo(exam.i + 1); render(); }
     else if (e.key === 'ArrowLeft' && exam.i > 0) { examGo(exam.i - 1); render(); }
   }
@@ -404,7 +405,7 @@ async function main() {
   QS = Array.isArray(DATA.questions) ? DATA.questions : [];
   N = QS.length;
   if (!N) { notFound('Đề này chưa có câu hỏi'); return; }
-  DATA.id = DATA.id || id;
+  DATA.id = id; // manifest id is authoritative for storage keys and links
   study = loadStudy();
   if (MODE === 'exam') {
     exam = loadExam();
