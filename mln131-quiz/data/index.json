@@ -37,6 +37,18 @@
       }
     },
     {
+      "id": "FA26-FE",
+      "title": "MLN131 · FA26 · FE",
+      "term": "FA26",
+      "code": "FE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
       "id": "SU26-B5-FE",
       "title": "MLN131 · SU26 · B5-FE",
       "term": "SU26",
