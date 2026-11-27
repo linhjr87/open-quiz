@@ -1,0 +1,160 @@
+{
+  "exams": [
+    {
+      "id": "FA26-FE-C1",
+      "title": "VNR202 · FA26 · FE-C1",
+      "term": "FA26",
+      "code": "FE-C1",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA26-FE-C2",
+      "title": "VNR202 · FA26 · FE-C2",
+      "term": "FA26",
+      "code": "FE-C2",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU26-B5-FE-RE",
+      "title": "VNR202 · SU26 · B5-FE-RE",
+      "term": "SU26",
+      "code": "B5-FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU26-FE-RE",
+      "title": "VNR202 · SU26 · FE-RE",
+      "term": "SU26",
+      "code": "FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SP26-B5-FE",
+      "title": "VNR202 · SP26 · B5-FE",
+      "term": "SP26",
+      "code": "B5-FE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SP26-B5-FE-RE",
+      "title": "VNR202 · SP26 · B5-FE-RE",
+      "term": "SP26",
+      "code": "B5-FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SP26-FE-RE",
+      "title": "VNR202 · SP26 · FE-RE",
+      "term": "SP26",
+      "code": "FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA25-B5-FE",
+      "title": "VNR202 · FA25 · B5-FE",
+      "term": "FA25",
+      "code": "B5-FE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA25-FE",
+      "title": "VNR202 · FA25 · FE",
+      "term": "FA25",
+      "code": "FE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "FA25-FE-RE",
+      "title": "VNR202 · FA25 · FE-RE",
+      "term": "FA25",
+      "code": "FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 59,
+        "disputed": 1,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SU25-B5-FE",
+      "title": "VNR202 · SU25 · B5-FE",
+      "term": "SU25",
+      "code": "B5-FE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SP25-FE",
+      "title": "VNR202 · SP25 · FE",
+      "term": "SP25",
+      "code": "FE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    },
+    {
+      "id": "SP25-FE-RE",
+      "title": "VNR202 · SP25 · FE-RE",
+      "term": "SP25",
+      "code": "FE-RE",
+      "count": 60,
+      "stats": {
+        "verified": 60,
+        "disputed": 0,
+        "aiOnly": 0
+      }
+    }
+  ]
+}

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
   loadState, saveState, formatTime, shuffled, storageKey, formatVotes, keyToLetter,
-  expireIfIdle, sanitizeHistory, loadHistory, appendAttempt, makeAttempt, wrongOf, historyStats, formatDate, bestOf,
+  expireIfIdle, migrateLegacy, recentAttempts, examKey, resolveSubject, sanitizeHistory, loadHistory, appendAttempt, makeAttempt, wrongOf, historyStats, formatDate, bestOf,
 } from '../assets/core.js';
 
 const manifest = { exams: [{ id: 'FA24-FE' }, { id: 'SP25-B5' }] };
@@ -114,7 +114,7 @@ test('shuffled is deterministic, non-mutating, a permutation', () => {
 });
 
 test('storageKey', () => {
-  assert.equal(storageKey('FA24-FE', 'exam'), 'mln131:FA24-FE:exam');
+  assert.equal(storageKey('FA24-FE', 'exam'), 'foq:FA24-FE:exam');
 });
 
 test('isCorrect is false when the question has an empty or missing answer', () => {
@@ -161,20 +161,20 @@ const qs3 = [
 ];
 const DAY = 86400000;
 
-test('expireIfIdle wipes only mln131: keys after more than 7 days idle', () => {
-  const st = fakeStorage({ 'mln131:lastSeen': String(0), 'mln131:X:history': '{}', 'other:key': '1' });
+test('expireIfIdle wipes only foq: keys after more than 7 days idle', () => {
+  const st = fakeStorage({ 'foq:lastSeen': String(0), 'foq:X:history': '{}', 'other:key': '1' });
   assert.equal(expireIfIdle(7 * DAY + 1, st), true);
-  assert.deepEqual(Object.keys(st.data).sort(), ['mln131:lastSeen', 'other:key']);
-  assert.equal(JSON.parse(st.data['mln131:lastSeen']), 7 * DAY + 1);
+  assert.deepEqual(Object.keys(st.data).sort(), ['foq:lastSeen', 'other:key']);
+  assert.equal(JSON.parse(st.data['foq:lastSeen']), 7 * DAY + 1);
 });
 test('expireIfIdle keeps data at exactly 7 days and when lastSeen is missing', () => {
-  const a = fakeStorage({ 'mln131:lastSeen': '0', 'mln131:X:study': '{}' });
+  const a = fakeStorage({ 'foq:lastSeen': '0', 'foq:X:study': '{}' });
   assert.equal(expireIfIdle(7 * DAY, a), false);
-  assert.ok('mln131:X:study' in a.data);
-  const b = fakeStorage({ 'mln131:X:study': '{}' });
+  assert.ok('foq:X:study' in a.data);
+  const b = fakeStorage({ 'foq:X:study': '{}' });
   assert.equal(expireIfIdle(123, b), false);
-  assert.ok('mln131:X:study' in b.data);
-  assert.equal(JSON.parse(b.data['mln131:lastSeen']), 123);
+  assert.ok('foq:X:study' in b.data);
+  assert.equal(JSON.parse(b.data['foq:lastSeen']), 123);
 });
 test('expireIfIdle returns false when storage throws', () => {
   const bad = { get length() { throw new Error('x'); }, getItem() { throw new Error('x'); }, setItem() { throw new Error('x'); } };
@@ -228,14 +228,14 @@ test('formatDate is dd/mm/yyyy', () => {
   assert.equal(formatDate(new Date(2026, 10, 2).getTime()), '02/11/2026');
 });
 test('expireIfIdle repairs a corrupt lastSeen without wiping data', () => {
-  const st = fakeStorage({ 'mln131:lastSeen': 'not json{', 'mln131:X:study': '{}' });
+  const st = fakeStorage({ 'foq:lastSeen': 'not json{', 'foq:X:study': '{}' });
   assert.equal(expireIfIdle(500, st), false);
-  assert.ok('mln131:X:study' in st.data);
-  assert.equal(JSON.parse(st.data['mln131:lastSeen']), 500);
+  assert.ok('foq:X:study' in st.data);
+  assert.equal(JSON.parse(st.data['foq:lastSeen']), 500);
 });
 test('bestOf merges the legacy best key with the history best', () => {
   const hist = (best) => ({ v: 1, attempts: best == null ? [{ mode: 'study' }] : [{ mode: 'exam', score10: best }] });
-  withLocalStorage({ value: fakeStorage({ 'mln131:L:best': '6.5', 'mln131:B:best': '4', 'mln131:J:best': '"x"' }) }, () => {
+  withLocalStorage({ value: fakeStorage({ 'foq:L:best': '6.5', 'foq:B:best': '4', 'foq:J:best': '"x"' }) }, () => {
     assert.equal(bestOf('L', hist(null)), 6.5);          // legacy only
     assert.equal(bestOf('H', hist(7)), 7);               // history only
     assert.equal(bestOf('B', hist(7)), 7);               // both -> max
@@ -259,4 +259,67 @@ test('keyToLetter maps letters (any case) and digits 1..n to option letters', ()
   assert.equal(keyToLetter('Enter', ls), null);
   assert.equal(keyToLetter('3', ['A', 'B', 'C', 'D', 'E']), 'C');
   assert.equal(keyToLetter('1', []), null);
+});
+
+test('examKey and storageKey scope keys by subject', () => {
+  assert.equal(storageKey(examKey('VNR202', 'FA24-FE'), 'history'), 'foq:VNR202/FA24-FE:history');
+});
+
+test('migrateLegacy moves every mln131: key under MLN131 and keeps existing new keys', () => {
+  const st = fakeStorage({
+    'mln131:lastSeen': '123',
+    'mln131:FA24-FE:history': '{"v":1,"attempts":[]}',
+    'mln131:FA24-FE:study': '{"old":1}',
+    'mln131:SP25-FE:best': '7.5',
+    'foq:MLN131/FA24-FE:study': '{"new":1}',
+    'other:key': 'x',
+  });
+  assert.equal(migrateLegacy(st), 3);
+  assert.deepEqual(Object.keys(st.data).sort(), [
+    'foq:MLN131/FA24-FE:history', 'foq:MLN131/FA24-FE:study', 'foq:MLN131/SP25-FE:best', 'foq:lastSeen', 'other:key',
+  ]);
+  assert.equal(st.data['foq:MLN131/FA24-FE:study'], '{"new":1}');
+  assert.equal(st.data['foq:MLN131/SP25-FE:best'], '7.5');
+  assert.equal(st.data['foq:lastSeen'], '123');
+  assert.equal(migrateLegacy(st), 0);
+});
+
+test('migrateLegacy then bestOf and loadHistory read the old data', () => {
+  const st = fakeStorage({
+    'mln131:SP25-FE:best': '6',
+    'mln131:SP25-FE:history': JSON.stringify({ v: 1, attempts: [{ mode: 'exam', at: 5, correct: 48, total: 60, score10: 8, responses: {} }] }),
+  });
+  withLocalStorage({ value: st }, () => {
+    migrateLegacy();
+    const key = examKey('MLN131', 'SP25-FE');
+    const h = loadHistory(key);
+    assert.equal(h.attempts.length, 1);
+    assert.equal(bestOf(key, h), 8);
+  });
+});
+
+test('migrateLegacy returns 0 when storage throws', () => {
+  withLocalStorage({ get() { throw new Error('blocked'); } }, () => assert.equal(migrateLegacy(), 0));
+});
+
+test('recentAttempts lists exams by their latest attempt, newest first', () => {
+  const att = (at) => ({ mode: 'study', at, correct: 1, total: 2, responses: {} });
+  const st = fakeStorage({
+    'foq:MLN131/FA24-FE:history': JSON.stringify({ v: 1, attempts: [att(10), att(30)] }),
+    'foq:VNR202/SP25-FE:history': JSON.stringify({ v: 1, attempts: [att(20)] }),
+    'foq:MLN131/SU24-FE:history': '{"v":1,"attempts":[]}',
+    'foq:MLN131/SU25-FE:history': 'broken{',
+    'foq:MLN131/FA24-FE:study': '{}',
+  });
+  const r = recentAttempts(3, st);
+  assert.deepEqual(r.map((x) => [x.subject, x.examId, x.k, x.attempt.at]), [['MLN131', 'FA24-FE', 2, 30], ['VNR202', 'SP25-FE', 1, 20]]);
+  assert.equal(recentAttempts(1, st).length, 1);
+});
+
+test('resolveSubject reads ?subject=, defaults old links to MLN131, rejects unknown codes', () => {
+  const list = { subjects: [{ code: 'MLN131', name: 'a', semester: 9 }, { code: 'VNR202', name: 'b', semester: 9 }] };
+  assert.equal(resolveSubject('?subject=VNR202&exam=X', list).code, 'VNR202');
+  assert.equal(resolveSubject('?exam=FA24-FE', list).code, 'MLN131');
+  assert.equal(resolveSubject('?subject=JPD113', list), null);
+  assert.equal(resolveSubject('?subject=VNR202', null), null);
 });

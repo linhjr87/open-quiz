@@ -7,6 +7,15 @@ export function resolveExamId(search, manifest) {
   return exams.some((e) => e.id === id) ? id : null;
 }
 
+// Mã môn từ `?subject=`, chỉ nhận môn có trong subjects.json. Link cũ (trước khi có nhiều môn)
+// không có `subject` nên mặc định là MLN131.
+export const LEGACY_SUBJECT = 'MLN131';
+export function resolveSubject(search, subjects) {
+  const code = new URLSearchParams(search || '').get('subject') || LEGACY_SUBJECT;
+  const list = (subjects && subjects.subjects) || [];
+  return list.find((s) => s && s.code === code) || null;
+}
+
 export function isCorrect(q, picked) {
   if (!Array.isArray(picked)) return false;
   if (!Array.isArray(q.answer) || q.answer.length === 0) return false;
@@ -99,19 +108,59 @@ export function shuffled(arr, seed) {
   return out;
 }
 
-export function storageKey(examId, mode) {
-  return `mln131:${examId}:${mode}`;
+// Mọi khoá localStorage của site bắt đầu bằng PREFIX. `examKey` là `<MÔN>/<id đề>`
+// (ví dụ `MLN131/FA24-FE`) vì cùng một id đề có thể có ở nhiều môn.
+export const PREFIX = 'foq:';
+export const LEGACY_PREFIX = 'mln131:';
+
+export const examKey = (subject, examId) => `${subject}/${examId}`;
+
+export function storageKey(key, mode) {
+  return `${PREFIX}${key}:${mode}`;
+}
+
+const storageKeys = (st) => {
+  const keys = [];
+  for (let i = 0; i < st.length; i++) {
+    const k = st.key(i);
+    if (typeof k === 'string') keys.push(k);
+  }
+  return keys;
+};
+
+// Chuyển dữ liệu của bản cũ (chỉ có MLN131, khoá `mln131:<id>:<mode>` và `mln131:lastSeen`)
+// sang khoá mới `foq:MLN131/<id>:<mode>` và `foq:lastSeen`. Chỉ chép khi khoá mới chưa có,
+// chép xong mới xoá khoá cũ. Trả số khoá đã chuyển; mọi lỗi storage bị nuốt.
+export function migrateLegacy(storage) {
+  try {
+    const st = storage === undefined ? globalThis.localStorage : storage;
+    let moved = 0;
+    for (const k of storageKeys(st)) {
+      if (!k.startsWith(LEGACY_PREFIX)) continue;
+      const rest = k.slice(LEGACY_PREFIX.length);
+      const target = rest === 'lastSeen' ? LAST_SEEN_KEY : `${PREFIX}${LEGACY_SUBJECT}/${rest}`;
+      const value = st.getItem(k);
+      if (st.getItem(target) === null && value !== null) {
+        st.setItem(target, value);
+        moved++;
+      }
+      st.removeItem(k);
+    }
+    return moved;
+  } catch {
+    return 0;
+  }
 }
 
 // ---- Lịch sử làm bài ----
 
 export const IDLE_RESET_MS = 604800000; // 7 ngày
 
-const LAST_SEEN_KEY = 'mln131:lastSeen';
+const LAST_SEEN_KEY = `${PREFIX}lastSeen`;
 
 const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 
-// Xoá toàn bộ khoá `mln131:*` nếu đã quá 7 ngày không mở trang, rồi ghi lại lastSeen.
+// Xoá toàn bộ khoá `foq:*` nếu đã quá 7 ngày không mở trang, rồi ghi lại lastSeen.
 // Trả true nếu đã xoá. Mọi lỗi storage bị nuốt (trả false).
 export function expireIfIdle(now, storage) {
   try {
@@ -123,12 +172,7 @@ export function expireIfIdle(now, storage) {
     }
     let wiped = false;
     if (typeof last === 'number' && Number.isFinite(last) && now - last > IDLE_RESET_MS) {
-      const keys = [];
-      for (let i = 0; i < st.length; i++) {
-        const k = st.key(i);
-        if (typeof k === 'string' && k.startsWith('mln131:')) keys.push(k);
-      }
-      for (const k of keys) st.removeItem(k);
+      for (const k of storageKeys(st)) if (k.startsWith(PREFIX)) st.removeItem(k);
       wiped = true;
     }
     st.setItem(LAST_SEEN_KEY, JSON.stringify(now));
@@ -204,6 +248,28 @@ export function bestOf(examId, history) {
   const hist = historyStats(history).best;
   const vals = [legacy, hist].filter(isNum);
   return vals.length ? Math.max(...vals) : null;
+}
+
+// Các đề có lịch sử, mới làm gần nhất trước: [{ subject, examId, k, attempt }] với attempt là
+// lần làm cuối của đề đó và k là số thứ tự (1-based) của nó. Dùng cho "Tiếp tục ôn" ở trang chủ.
+export function recentAttempts(limit = 3, storage) {
+  try {
+    const st = storage === undefined ? globalThis.localStorage : storage;
+    const out = [];
+    for (const k of storageKeys(st)) {
+      const m = /^foq:([^/:]+)\/([^:]+):history$/.exec(k);
+      if (!m) continue;
+      let raw = null;
+      try { raw = JSON.parse(st.getItem(k)); } catch { raw = null; }
+      const { attempts } = sanitizeHistory(raw);
+      if (!attempts.length) continue;
+      out.push({ subject: m[1], examId: m[2], k: attempts.length, attempt: attempts[attempts.length - 1] });
+    }
+    out.sort((a, b) => b.attempt.at - a.attempt.at);
+    return out.slice(0, limit);
+  } catch {
+    return [];
+  }
 }
 
 export function formatDate(ms) {

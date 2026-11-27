@@ -1,6 +1,7 @@
-"""Build ``data/index.json`` (the exam manifest) from ``data/*.json`` (stdlib only).
+"""Build each subject's ``index.json`` (the exam manifest) from its exam files (stdlib only).
 
-CLI: python -I tools/build_manifest.py [data/]
+CLI: python -I tools/build_manifest.py [data/]          every subject listed in data/subjects.json
+     python -I tools/build_manifest.py data/MLN131      one subject folder
 """
 import argparse
 import json
@@ -11,6 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+from subjects import is_root, subject_dirs  # noqa: E402
 from validate import _stats  # noqa: E402
 
 SEASON_ORDER = {"SP": 0, "SU": 1, "FA": 2}
@@ -58,12 +60,26 @@ def write_manifest(data_dir):
     return manifest
 
 
+def write_all(root):
+    """Rebuild ``index.json`` in every subject folder of a data root (creating empty ones)."""
+    built = []
+    for code, folder in subject_dirs(root):
+        folder.mkdir(exist_ok=True)
+        built.append((code, write_manifest(folder)))
+    return built
+
+
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Build data/index.json.")
-    parser.add_argument("data_dir", nargs="?", default=str(DEFAULT_DATA_DIR))
+    parser = argparse.ArgumentParser(description="Build index.json for each subject.")
+    parser.add_argument("data_dir", nargs="?", default=str(DEFAULT_DATA_DIR),
+                        help="data root (has subjects.json) or one subject folder")
     args = parser.parse_args(argv)
-    manifest = write_manifest(args.data_dir)
-    print(f"index.json: {len(manifest['exams'])} exams")
+    if is_root(args.data_dir):
+        for code, manifest in write_all(args.data_dir):
+            print(f"{code}/index.json: {len(manifest['exams'])} exams")
+    else:
+        manifest = write_manifest(args.data_dir)
+        print(f"index.json: {len(manifest['exams'])} exams")
     return 0
 
 

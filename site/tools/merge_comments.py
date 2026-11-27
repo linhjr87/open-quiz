@@ -1,6 +1,6 @@
 """Merge community comment votes (answers_all.csv) into exam JSON files (stdlib only).
 
-CLI: python -I tools/merge_comments.py --csv <answers_all.csv> --mln <MLN131 dir> [--only FA24-B5-FE]
+CLI: python -I tools/merge_comments.py --csv <answers_all.csv> --images <subject image dir> --data data/<SUBJECT> [--only FA24-B5-FE]
 """
 import argparse
 import csv
@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from build_manifest import DEFAULT_DATA_DIR, write_manifest  # noqa: E402
+from build_manifest import write_manifest  # noqa: E402
 from reconcile import _filter_votes, reconcile  # noqa: E402,F401
 from validate import validate_exam  # noqa: E402
 
@@ -107,8 +107,9 @@ def load_source(mln_dir, term, code):
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Merge comment votes into exam data.")
     parser.add_argument("--csv", required=True, help="answers_all.csv")
-    parser.add_argument("--mln", required=True, help="MLN131 directory (<TERM>/<CODE>/comments.json)")
-    parser.add_argument("--data", default=str(DEFAULT_DATA_DIR), help="data directory")
+    parser.add_argument("--images", "--mln", dest="images", required=True,
+                        help="subject image directory (<TERM>/<CODE>/comments.json)")
+    parser.add_argument("--data", required=True, help="the subject's data folder, e.g. data/MLN131")
     parser.add_argument("--only", help="only this exam id, e.g. FA24-B5-FE")
     args = parser.parse_args(argv)
 
@@ -131,7 +132,7 @@ def main(argv=None):
         if not dist_by_n:
             print(f"{exam['id']}: no comment data")
             continue
-        source = load_source(args.mln, exam["term"], exam["code"])
+        source = load_source(args.images, exam["term"], exam["code"])
         merge(exam, dist_by_n, source)
         with open(path, "w", encoding="utf-8", newline="\n") as f:
             json.dump(exam, f, ensure_ascii=False, indent=2)

@@ -1,6 +1,7 @@
-"""Validate MLN131 exam data files and the manifest (stdlib only).
+"""Validate exam data files and the manifests (stdlib only).
 
-CLI: python -I tools/validate.py [--draft] [--images ../MLN131] [--check-manifest] data/
+CLI: python -I tools/validate.py [--draft] [--images ../Exams] [--check-manifest] data/
+     python -I tools/validate.py [--images ../Exams/Semester9/MLN131] data/MLN131
 Exits 1 if any error is found; prints ``<file>: <error>`` lines.
 """
 import argparse
@@ -12,6 +13,7 @@ from pathlib import Path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from reconcile import reconcile  # noqa: E402
+from subjects import SUBJECTS_FILE, is_root, load_subjects  # noqa: E402
 
 REQUIRED_KEYS = ("id", "subject", "term", "code", "title", "questions")
 OPTION_LETTERS = "ABCDEF"
@@ -226,20 +228,12 @@ def _count_images(images_dir, data):
     return sum(1 for _ in folder.glob("*.webp")), []
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description="Validate MLN131 exam data.")
-    parser.add_argument("path", help="data directory (or a single JSON file)")
-    parser.add_argument("--draft", action="store_true", help="allow missing answer fields")
-    parser.add_argument("--images", help="MLN131 image root; <term>/<code>/*.webp is counted")
-    parser.add_argument(
-        "--check-manifest", action="store_true", help="also check index.json against the data"
-    )
-    args = parser.parse_args(argv)
+def validate_dir(target, draft=False, images=None, check_manifest=False, subject=None):
+    """Validate one subject folder (or one JSON file); print errors, return their count.
 
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
-
-    target = Path(args.path)
+    ``subject``: when set, every exam's ``subject`` must equal it (the folder name).
+    """
+    target = Path(target)
     files = [target] if target.is_file() else sorted(target.glob("*.json"))
     files = [f for f in files if f.name != "index.json"]
 
@@ -253,16 +247,18 @@ def main(argv=None):
             problems += 1
             continue
         image_count, errors = None, []
-        if args.images:
-            image_count, errors = _count_images(args.images, data if isinstance(data, dict) else {})
-        errors += validate_exam(data, image_count=image_count, draft=args.draft)
+        if images:
+            image_count, errors = _count_images(images, data if isinstance(data, dict) else {})
+        errors += validate_exam(data, image_count=image_count, draft=draft)
+        if subject and isinstance(data, dict) and "subject" in data and data["subject"] != subject:
+            errors.append(f"subject: {data['subject']!r} must equal its folder {subject!r}")
         if isinstance(data, dict) and isinstance(data.get("id"), str):
             exams[data["id"]] = data
         for e in errors:
             print(f"{f}: {e}")
         problems += len(errors)
 
-    if args.check_manifest:
+    if check_manifest:
         index = (target if target.is_dir() else target.parent) / "index.json"
         try:
             errors = validate_manifest(_load_json(index), exams)
@@ -271,7 +267,61 @@ def main(argv=None):
         for e in errors:
             print(f"{index}: {e}")
         problems += len(errors)
+    return problems
 
+
+def validate_root(root, draft=False, images=None, check_manifest=False):
+    """Validate a data root: ``subjects.json`` plus one folder per listed subject.
+
+    ``images``: the ``Exams`` folder; a subject's images are ``Semester<n>/<CODE>``.
+    Folders or JSON files in the root that ``subjects.json`` does not account for are errors.
+    """
+    root = Path(root)
+    try:
+        listed = load_subjects(root)
+    except (OSError, ValueError) as exc:
+        print(f"{root / SUBJECTS_FILE}: {exc}")
+        return 1
+    codes = {s["code"] for s in listed}
+    problems = 0
+    for p in sorted(root.iterdir()):
+        if p.is_dir() and p.name not in codes:
+            print(f"{p}: folder is not listed in {SUBJECTS_FILE}")
+            problems += 1
+        elif p.is_file() and p.suffix == ".json" and p.name != SUBJECTS_FILE:
+            print(f"{p}: exam files belong in a subject folder, not the data root")
+            problems += 1
+    for s in listed:
+        folder = root / s["code"]
+        if not folder.is_dir():
+            print(f"{folder}: listed in {SUBJECTS_FILE} but the folder is missing")
+            problems += 1
+            continue
+        img = Path(images) / f"Semester{s['semester']}" / s["code"] if images else None
+        problems += validate_dir(folder, draft, img, check_manifest, subject=s["code"])
+    return problems
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Validate exam data.")
+    parser.add_argument("path", help="data root (has subjects.json), one subject folder, or one JSON file")
+    parser.add_argument("--draft", action="store_true", help="allow missing answer fields")
+    parser.add_argument(
+        "--images",
+        help="image root: the Exams folder for a data root, or <TERM>/<CODE>/*.webp for one subject",
+    )
+    parser.add_argument(
+        "--check-manifest", action="store_true", help="also check index.json against the data"
+    )
+    args = parser.parse_args(argv)
+
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+
+    if is_root(args.path):
+        problems = validate_root(args.path, args.draft, args.images, args.check_manifest)
+    else:
+        problems = validate_dir(args.path, args.draft, args.images, args.check_manifest)
     return 1 if problems else 0
 
 
