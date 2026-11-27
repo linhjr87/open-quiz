@@ -7,11 +7,15 @@ __pycache__/
 cookie.txt
 .env
 
-# Data
-MLN131/
+# Data: Exams/Semester<n>/<MON>/... ; MLN131 = junction -> Exams/Semester9/MLN131 (cho ../MLN131 tu site/)
+Exams/
+MLN131
 
 # Agent scratch
 .superpowers/
 
 # REA
 fuexam_*.py
+
+# OCR: output Gemini (ocr/README.md)
+ocr/staging/

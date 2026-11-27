@@ -1,4 +1,4 @@
-name: Deploy MLN131 quiz to GitHub Pages
+name: Deploy FU-open-quiz to GitHub Pages
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: mln131-quiz
+        working-directory: site
     steps:
       - uses: actions/checkout@v4
 
@@ -44,7 +44,7 @@ jobs:
 
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: mln131-quiz
+          path: site
 
   deploy:
     needs: build

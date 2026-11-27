@@ -1,16 +1,20 @@
 import {
   resolveExamId, isCorrect, scoreExam, sanitizeResponses,
-  loadState, saveState, formatTime, shuffled, storageKey, formatVotes, keyToLetter,
+  loadState, saveState, formatTime, shuffled, storageKey, keyToLetter,
   loadHistory, wrongOf, historyStats, formatDate, bestOf, makeAttempt, appendAttempt, expireIfIdle,
+  migrateLegacy, resolveSubject, examKey,
 } from './core.js';
 import { ic, drumSvg, esc } from './icons.js';
 
 const REPO = 'linhjr87/open-quiz';
+const PLATFORM = 'FU-open-quiz';
 
 const app = document.getElementById('app');
 const params = new URLSearchParams(location.search);
 const MODE = ['exam', 'history', 'review'].includes(params.get('mode')) ? params.get('mode') : 'study';
 
+let SUBJECT = null;    // { code, name, semester } from data/subjects.json
+let KEY = '';          // storage key of this exam: <MÔN>/<id>
 let DATA = null;       // exam JSON
 let QS = [];           // questions
 let N = 0;
@@ -31,31 +35,20 @@ const examTitle = () => (DATA.term && DATA.code ? `${DATA.term} · ${DATA.code}`
 
 /* ---------- small helpers ---------- */
 const isSplit = () => view === 'study' || view === 'exam' || (view === 'review' && !!review);
-function badge(q) {
-  const aiKey = [...(q.aiAnswer || q.answer || [])].sort().join('');
-  const dist = esc(formatVotes(q.commentVotes, aiKey));
-  if (q.status === 'verified') {
-    return `<span class="badge b-ok">${ic('shield')}Đã đối chiếu${dist ? ` · ${dist}` : ''}</span>`;
-  }
-  if (q.status === 'disputed') {
-    const ca = Array.isArray(q.commentAnswer) ? q.commentAnswer.join('') : '';
-    return `<span class="badge b-warn">${ic('warn')}Có tranh cãi · comment chọn ${esc(ca || '?')}${dist ? ` · ${dist}` : ''}</span>`;
-  }
-  return `<span class="badge b-ai">${ic('cpu')}Đáp án AI, chưa đối chiếu</span>`;
-}
 function reportLink(q) {
-  const title = encodeURIComponent(`[${DATA.id}] Câu ${q.n}: `);
+  const title = encodeURIComponent(`[${SUBJECT.code} ${DATA.id}] Câu ${q.n}: `);
   return `<a class="report" href="https://github.com/${REPO}/issues/new?title=${title}" target="_blank" rel="noopener">${ic('msg')}Báo lỗi câu này</a>`;
 }
 function quizFoot() {
   return `<footer class="wrap${isSplit() ? ' wide' : ''} foot">Không chính thức — đáp án có thể sai · <a href="https://github.com/${REPO}/issues" target="_blank" rel="noopener">Báo lỗi</a></footer>`;
 }
-const modeUrl = (mode, extra = '') => `quiz.html?exam=${encodeURIComponent(DATA.id)}&amp;mode=${mode}${extra}`;
+const subjectUrl = () => `index.html?subject=${encodeURIComponent(SUBJECT.code)}`;
+const modeUrl = (mode, extra = '') => `quiz.html?subject=${encodeURIComponent(SUBJECT.code)}&amp;exam=${encodeURIComponent(DATA.id)}&amp;mode=${mode}${extra}`;
 function topbar(title, sub, right = '', back = 'home') {
-  const href = back === 'history' ? modeUrl('history') : 'index.html';
+  const href = back === 'history' ? modeUrl('history') : subjectUrl();
   return `<header class="bar"><div class="wrap${isSplit() ? ' wide' : ''}">
-    <a class="iconbtn" href="${href}" aria-label="${back === 'history' ? 'Về lịch sử' : 'Về trang chủ'}">${ic('back')}</a>
-    <div class="bar-title"><b>${esc(title)}</b><span>${esc(sub)}</span></div>
+    <a class="iconbtn" href="${href}" aria-label="${back === 'history' ? 'Về lịch sử' : `Về trang môn ${esc(SUBJECT.code)}`}">${ic('back')}</a>
+    <div class="bar-title"><b>${esc(title)}</b><span>${esc(SUBJECT.code)} · ${esc(sub)}</span></div>
     <div class="spacer"></div>${right}</div></header>`;
 }
 function answerLines(q, ls) {
@@ -127,7 +120,7 @@ function afterBlock(q, locked, draft, checkAct) {
     const ok = isCorrect(q, locked);
     return `<div class="after" aria-live="polite">
       <span class="verdict ${ok ? 'ok' : 'bad'}" tabindex="-1">${ok ? `${ic('check')}Chính xác` : `${ic('x')}Chưa đúng · đáp án ${esc((q.answer || []).join(', '))}`}</span>
-      ${badge(q)}${reportLink(q)}</div>`;
+      ${reportLink(q)}</div>`;
   }
   if (p > 1) {
     return `<div class="after"><button class="btn primary" data-act="${checkAct}" ${draft.length === p ? '' : 'disabled'}>${ic('check')}Kiểm tra</button><span class="q-hint">Đã chọn ${draft.length}/${p}</span>${reportLink(q)}</div>`;
@@ -151,7 +144,7 @@ const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x))
 
 /* ---------- persistence ---------- */
 function loadStudy() {
-  const raw = loadState(storageKey(DATA.id, 'study'), null);
+  const raw = loadState(storageKey(KEY, 'study'), null);
   const obj = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   const i = Number.isInteger(obj.i) && obj.i >= 0 && obj.i < N ? obj.i : 0;
   const responses = sanitizeResponses(QS, obj.responses);
@@ -163,11 +156,11 @@ function loadStudy() {
 function saveStudy() {
   const out = { i: study.i, responses: study.responses };
   if (study.recorded) out.recorded = study.recorded;
-  saveState(storageKey(DATA.id, 'study'), out);
+  saveState(storageKey(KEY, 'study'), out);
 }
 const freshStudy = () => ({ i: 0, responses: {}, draft: [], confirmReset: false });
 function loadExam() {
-  const raw = loadState(storageKey(DATA.id, 'exam'), null);
+  const raw = loadState(storageKey(KEY, 'exam'), null);
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
   const { endAt, order, flags, minutes } = raw;
   if (typeof endAt !== 'number' || !Number.isFinite(endAt)) return null;
@@ -187,7 +180,7 @@ function loadExam() {
 }
 function saveExam() {
   if (!exam || exam.submitted) return;
-  saveState(storageKey(DATA.id, 'exam'), {
+  saveState(storageKey(KEY, 'exam'), {
     endAt: exam.endAt, responses: exam.responses, flags: [...exam.flags],
     order: exam.order, minutes: exam.minutes, i: exam.i,
   });
@@ -267,8 +260,8 @@ function afterStudyLock(locked, q) {
 // and show the completion card. Call after focusAfterAnswer so the card wins focus.
 function maybeRecordStudy() {
   if (study.recorded || Object.keys(study.responses).length !== N) return;
-  study.recorded = appendAttempt(DATA.id, makeAttempt('study', QS, study.responses, Date.now()));
-  HIST = loadHistory(DATA.id);
+  study.recorded = appendAttempt(KEY, makeAttempt('study', QS, study.responses, Date.now()));
+  HIST = loadHistory(KEY);
   saveStudy();
   focusNext = '#doneCard';
   scrollTop = true;
@@ -284,7 +277,7 @@ function renderHistory() {
     <div class="acts-inline">${modeActs}</div></div></main>`;
   }
   const st = historyStats(HIST);
-  const best = bestOf(DATA.id, HIST);
+  const best = bestOf(KEY, HIST);
   const rows = HIST.attempts.map((a, idx) => ({ a, k: idx + 1 })).reverse().map(({ a, k }) => {
     const wrong = wrongOf(a, QS).length;
     const res = a.mode === 'exam'
@@ -483,13 +476,13 @@ function submit(auto = false) {
   exam.auto = auto;
   exam.confirm = false;
   exam.result = scoreExam(QS, exam.responses);
-  exam.k = appendAttempt(DATA.id, makeAttempt('exam', QS, exam.responses, Date.now(), auto));
-  HIST = loadHistory(DATA.id);
-  const key = storageKey(DATA.id, 'best');
+  exam.k = appendAttempt(KEY, makeAttempt('exam', QS, exam.responses, Date.now(), auto));
+  HIST = loadHistory(KEY);
+  const key = storageKey(KEY, 'best');
   const prev = loadState(key, null);
   const best = typeof prev === 'number' && Number.isFinite(prev) ? Math.max(prev, exam.result.score10) : exam.result.score10;
   saveState(key, best);
-  saveState(storageKey(DATA.id, 'exam'), null); // clear the in-progress exam
+  saveState(storageKey(KEY, 'exam'), null); // clear the in-progress exam
   view = 'result';
   render();
   window.scrollTo(0, 0);
@@ -509,7 +502,7 @@ function renderResult() {
       <div class="ans">
         <div><span class="tag">Bạn chọn</span><span class="yours">${p ? answerLines(q, p) : 'Bỏ trống'}</span></div>
         <div><span class="tag">Đáp án</span><span class="key">${answerLines(q, q.answer || [])}</span></div>
-      </div><div class="after" style="margin-top:10px">${badge(q)}${reportLink(q)}</div></div>`;
+      </div><div class="after" style="margin-top:10px">${reportLink(q)}</div></div>`;
   }).join('');
   const acts = (wrong.length ? `<a class="btn primary" href="${modeUrl('review', `&amp;attempt=${exam.k}`)}">${ic('target')}Ôn ${wrong.length} câu sai</a>` : '') +
     `<button class="btn${wrong.length ? '' : ' primary'}" data-act="examStart">${ic('reset')}Thi lại</button><a class="btn" href="${modeUrl('history')}">${ic('history')}Xem lịch sử</a><a class="btn ghost" href="${modeUrl('study')}">${ic('book')}Ôn tập đề này</a>`;
@@ -541,7 +534,7 @@ function render() {
     : view === 'review' ? renderReview()
     : view === 'examStart' ? renderExamStart()
     : view === 'exam' ? renderExam() : renderResult()) + quizFoot();
-  document.title = `${examTitle()} · MLN131`;
+  document.title = `${examTitle()} · ${SUBJECT.code} · ${PLATFORM}`;
   const want = focusNext || fk;
   focusNext = null;
   if (want) { const el = app.querySelector(want); if (el && !el.disabled) el.focus({ preventScroll: true }); }
@@ -645,22 +638,28 @@ document.addEventListener('keydown', (e) => {
 /* ---------- boot ---------- */
 function notFound(msg) {
   view = 'none';
-  document.title = 'Không tìm thấy đề · MLN131';
-  app.innerHTML = `<header class="bar"><div class="wrap"><div class="brand">${drumSvg(26, 'star', true)}<span class="mark">MLN131</span>Phòng thi thử</div></div></header>
+  document.title = `Không tìm thấy đề · ${PLATFORM}`;
+  app.innerHTML = `<header class="bar"><div class="wrap"><a class="brand" href="index.html">${drumSvg(26, 'star', true)}${PLATFORM}</a></div></header>
     <main class="wrap"><div class="notice"><h1>${esc(msg)}</h1><p>Đề này không có trong danh sách hoặc không tải được.</p><a class="btn primary" href="index.html">${ic('back')}Về trang chủ</a></div></main>${quizFoot()}`;
 }
 async function main() {
+  migrateLegacy();
   expireIfIdle(Date.now());
+  const getJson = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  };
   let manifest;
   try {
-    const res = await fetch('data/index.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    manifest = await res.json();
+    SUBJECT = resolveSubject(location.search, await getJson('data/subjects.json'));
+    if (!SUBJECT) { notFound('Không tìm thấy môn này'); return; }
+    manifest = await getJson(`data/${encodeURIComponent(SUBJECT.code)}/index.json`);
   } catch (err) { console.error(err); notFound('Không tải được danh sách đề'); return; }
   const id = resolveExamId(location.search, manifest);
   if (!id) { notFound('Không tìm thấy đề'); return; }
   try {
-    const res = await fetch(`data/${encodeURIComponent(id)}.json`);
+    const res = await fetch(`data/${encodeURIComponent(SUBJECT.code)}/${encodeURIComponent(id)}.json`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     DATA = await res.json();
   } catch (err) { console.error(err); notFound('Không tìm thấy đề'); return; }
@@ -668,8 +667,9 @@ async function main() {
   N = QS.length;
   if (!N) { notFound('Đề này chưa có câu hỏi'); return; }
   DATA.id = id; // manifest id is authoritative for storage keys and links
+  KEY = examKey(SUBJECT.code, id);
   study = loadStudy();
-  HIST = loadHistory(DATA.id);
+  HIST = loadHistory(KEY);
   if (MODE === 'history') view = 'history';
   else if (MODE === 'review') { review = startReview(params.get('attempt')); view = 'review'; }
   else if (MODE === 'exam') {
